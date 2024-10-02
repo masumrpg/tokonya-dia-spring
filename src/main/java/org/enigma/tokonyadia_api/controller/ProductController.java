@@ -1,6 +1,7 @@
 package org.enigma.tokonyadia_api.controller;
 
 import org.enigma.tokonyadia_api.constant.Constant;
+import org.enigma.tokonyadia_api.dto.request.ProductUpdateRequest;
 import org.enigma.tokonyadia_api.entity.Customer;
 import org.enigma.tokonyadia_api.entity.Product;
 import org.enigma.tokonyadia_api.service.impl.CustomerServiceImpl;
@@ -29,7 +30,7 @@ public class ProductController {
     }
 
     @PutMapping("/{productId}")
-    public Product updateCustomer(@PathVariable String productId,@RequestBody Product product) {
+    public Product updateCustomer(@PathVariable String productId,@RequestBody ProductUpdateRequest product) {
         return productServiceImpl.update(productId, product);
     }
 

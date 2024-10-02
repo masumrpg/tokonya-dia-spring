@@ -1,8 +1,12 @@
 package org.enigma.tokonyadia_api.service.impl;
 
+import org.enigma.tokonyadia_api.dto.request.ProductUpdateRequest;
 import org.enigma.tokonyadia_api.entity.Product;
+import org.enigma.tokonyadia_api.entity.Store;
 import org.enigma.tokonyadia_api.repository.ProductRepository;
+import org.enigma.tokonyadia_api.repository.StoreRepository;
 import org.enigma.tokonyadia_api.service.ProductService;
+import org.enigma.tokonyadia_api.service.StoreService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,9 +15,11 @@ import java.util.Optional;
 @Service
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
+    private final StoreService storeService;
 
-    public ProductServiceImpl(ProductRepository productRepository) {
+    public ProductServiceImpl(ProductRepository productRepository, StoreService storeService) {
         this.productRepository = productRepository;
+        this.storeService = storeService;
     }
 
     @Override
@@ -31,7 +37,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Product update(String id, Product product) {
+    public Product update(String id, ProductUpdateRequest product) {
         Optional<Product> byId = productRepository.findById(id);
         if (byId.isPresent()) {
             Product updatedProduct = byId.get();
@@ -39,7 +45,12 @@ public class ProductServiceImpl implements ProductService {
             updatedProduct.setDescription(product.getDescription());
             updatedProduct.setPrice(product.getPrice());
             updatedProduct.setStock(product.getStock());
-            // TODO search store
+            // FIXED
+            Store store = storeService.getById(product.getStoreId());
+            System.out.println(store);
+            if (store != null) {
+                updatedProduct.setStore(store);
+            }
             return productRepository.save(updatedProduct);
         }
         return null;
