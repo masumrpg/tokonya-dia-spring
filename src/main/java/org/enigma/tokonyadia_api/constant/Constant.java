@@ -1,5 +1,6 @@
 package org.enigma.tokonyadia_api.constant;
 
+// Move brnach to crud
 public class Constant {
     // Table
     public static final String CUSTOMER_TABLE = "m_customer";
