@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = Constant.TRANSACTION_TABLE)
+@Builder
 public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

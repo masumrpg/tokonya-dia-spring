@@ -1,6 +1,5 @@
 package org.enigma.tokonyadia_api.constant;
 
-// Move brnach to crud
 public class Constant {
     // Table
     public static final String CUSTOMER_TABLE = "m_customer";
@@ -13,4 +12,23 @@ public class Constant {
     public static final String CUSTOMER_API = "/api/customers";
     public static final String PRODUCT_API = "/api/products";
     public static final String STORE_API = "/api/stores";
+    public static final String TRANSACTION_API = "/api/transactions";
+    public static final String TRANSACTION_DETAIL_API = "/api/transaction_details";
+
+    // Message
+    // customer
+    public static final String SUCCESS_CREATED_CUSTOMER = "Successfully created customer";
+    public static final String SUCCESS_GET_CUSTOMER = "Successfully get customer";
+    public static final String SUCCESS_UPDATE_CUSTOMER = "Successfully update customer";
+    public static final String SUCCESS_DELETE_CUSTOMER = "Successfully delete customer";
+    // store
+    public static final String SUCCESS_CREATED_STORE = "Successfully created store";
+    public static final String SUCCESS_GET_STORE = "Successfully get store";
+    public static final String SUCCESS_UPDATE_STORE = "Successfully update store";
+    public static final String SUCCESS_DELETE_STORE = "Successfully delete store";
+    // product
+    public static final String SUCCESS_CREATED_PRODUCT = "Successfully created product";
+    public static final String SUCCESS_GET_PRODUCT = "Successfully get product";
+    public static final String SUCCESS_UPDATE_PRODUCT = "Successfully update product";
+    public static final String SUCCESS_DELETE_PRODUCT = "Successfully delete product";
 }

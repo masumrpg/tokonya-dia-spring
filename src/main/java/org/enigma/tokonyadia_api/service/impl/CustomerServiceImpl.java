@@ -1,13 +1,24 @@
 package org.enigma.tokonyadia_api.service.impl;
 
+import org.enigma.tokonyadia_api.dto.request.CustomerRequest;
+import org.enigma.tokonyadia_api.dto.response.CustomerResponse;
 import org.enigma.tokonyadia_api.entity.Customer;
 import org.enigma.tokonyadia_api.repository.CustomerRepository;
 import org.enigma.tokonyadia_api.service.CustomerService;
+import org.enigma.tokonyadia_api.utils.SortUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.awt.*;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
@@ -19,57 +30,90 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Customer create(Customer customer) {
-        Optional<Customer> byPhone = customerRepository.findByPhoneNumber(customer.getPhoneNumber());
-        if (byPhone.isPresent()) {
-            throw new RuntimeException("Pelanggan dengan no hp " + customer.getPhoneNumber() + " sudah ada!");
-        }
-        Optional<Customer> byEmail = customerRepository.findByEmail(customer.getEmail());
-        if (byEmail.isPresent()) {
-            throw new RuntimeException("Pelanggan dengan email " + customer.getEmail() + " sudah ada!");
-        }
-        return customerRepository.save(customer);
+    public CustomerResponse create(CustomerRequest customerRequest) {
+        verifyByPhoneNumber(customerRequest.getPhoneNumber());
+        verifyByEmail(customerRequest.getEmail());
+        Customer customer = Customer.builder()
+                .name(customerRequest.getName())
+                .phoneNumber(customerRequest.getPhoneNumber())
+                .email(customerRequest.getEmail())
+                .address(customerRequest.getAddress())
+                .build();
+        customerRepository.saveAndFlush(customer);
+        return toCustomerResponse(customer);
     }
 
     @Override
-    public Customer getById(String id) {
+    public CustomerResponse getById(String id) {
+        return toCustomerResponse(getOne(id));
+    }
+
+    @Override
+    public CustomerResponse update(String id, CustomerRequest customerRequest) {
+        verifyByPhoneNumber(customerRequest.getPhoneNumber());
+        verifyByEmail(customerRequest.getEmail());
+        Customer customer = getOne(id);
+        customer.setName(customerRequest.getName());
+        customer.setPhoneNumber(customerRequest.getPhoneNumber());
+        customer.setEmail(customerRequest.getEmail());
+        customer.setAddress(customerRequest.getAddress());
+        customerRepository.save(customer);
+        return toCustomerResponse(customer);
+    }
+
+    @Override
+    public void delete(String id) {
+        Customer customer = getOne(id);
+        customerRepository.delete(customer);
+    }
+
+    @Override
+    public Page<CustomerResponse> getAll(Integer page, Integer size, String sort) {
+        if (page <= 0) page = 1;
+
+        Sort sortBy = SortUtil.parseSort(sort);
+
+        Pageable pageRequest = PageRequest.of((page -1), size, sortBy);
+
+        Page<Customer> menus = customerRepository.findAll(pageRequest);
+
+        return menus.map(new Function<Customer, CustomerResponse>() {
+            @Override
+            public CustomerResponse apply(Customer customer) {
+                return toCustomerResponse(customer);
+            }
+        });
+    }
+
+    private Customer getOne(String id) {
         Optional<Customer> byId = customerRepository.findById(id);
         if (byId.isPresent()) {
             return byId.get();
         }
-        throw new RuntimeException("Pelanggan dengan id " + id + " tidak ada!");
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer not found");
     }
 
-    @Override
-    public Customer update(String id, Customer customer) {
-        Optional<Customer> byId = customerRepository.findById(id);
-        if (byId.isPresent()) {
-            Customer customerToUpdate = byId.get();
-            customerToUpdate.setName(customer.getName());
-            customerToUpdate.setAddress(customer.getAddress());
-            customerToUpdate.setEmail(customer.getEmail());
-            customerToUpdate.setPhoneNumber(customer.getPhoneNumber());
-            return customerRepository.save(customerToUpdate);
+    private void verifyByPhoneNumber(String phoneNumber) {
+        Optional<Customer> byPhone = customerRepository.findByPhoneNumber(phoneNumber);
+        if (byPhone.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Phone with " + phoneNumber + " already exists!");
         }
-        throw new RuntimeException("Pelanggan dengan id " + id + " tidak ada!");
     }
 
-    @Override
-    public String delete(String id) {
-        Optional<Customer> byId = customerRepository.findById(id);
-        if (byId.isPresent()) {
-            customerRepository.delete(byId.get());
-            return "Pelanggan dengan id " + id + " sukses dihapus!";
+    private void verifyByEmail(String email) {
+        Optional<Customer> byEmail = customerRepository.findByEmail(email);
+        if (byEmail.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email with " + email + " already exists!");
         }
-        throw new RuntimeException("Pelanggan dengan id " + id + " tidak ada!");
     }
 
-    @Override
-    public List<Customer> getAll() {
-        List<Customer> customerList = customerRepository.findAll();
-        if (customerList.isEmpty()) {
-            throw new RuntimeException("Pelanggan dengan tidak ada!");
-        }
-        return customerList;
+    private CustomerResponse toCustomerResponse(Customer customer) {
+        return CustomerResponse.builder()
+                .id(customer.getId())
+                .name(customer.getName())
+                .address(customer.getAddress())
+                .phoneNumber(customer.getPhoneNumber())
+                .email(customer.getEmail())
+                .build();
     }
 }

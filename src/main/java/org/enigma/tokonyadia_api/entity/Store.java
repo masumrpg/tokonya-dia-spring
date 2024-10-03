@@ -10,6 +10,7 @@ import org.enigma.tokonyadia_api.constant.Constant;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = Constant.STORE_TABLE)
+@Builder
 public class Store {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

@@ -12,6 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = Constant.PRODUCT_TABLE)
+@Builder
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
