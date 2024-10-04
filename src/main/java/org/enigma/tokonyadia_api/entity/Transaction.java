@@ -5,6 +5,7 @@ import lombok.*;
 import org.enigma.tokonyadia_api.constant.Constant;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Setter
@@ -25,6 +26,9 @@ public class Transaction {
     @Column(name = "transaction_date", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime transactionDate;
+
+    @OneToMany(mappedBy = "transaction", cascade = CascadeType.ALL)
+    private List<TransactionDetail> transactionDetails;
 
     @PrePersist
     protected void onCreate() {

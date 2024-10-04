@@ -1,22 +1,24 @@
 package org.enigma.tokonyadia_api.service.impl;
 
 import org.enigma.tokonyadia_api.dto.request.CustomerRequest;
+import org.enigma.tokonyadia_api.dto.request.SearchCustomerRequest;
 import org.enigma.tokonyadia_api.dto.response.CustomerResponse;
 import org.enigma.tokonyadia_api.entity.Customer;
 import org.enigma.tokonyadia_api.repository.CustomerRepository;
 import org.enigma.tokonyadia_api.service.CustomerService;
+import org.enigma.tokonyadia_api.specification.GenericSpecificationBuilder;
 import org.enigma.tokonyadia_api.utils.SortUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.awt.*;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -68,21 +70,16 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Page<CustomerResponse> getAll(Integer page, Integer size, String sort) {
-        if (page <= 0) page = 1;
+    public Page<CustomerResponse> getAll(SearchCustomerRequest request) {
+        Sort sortBy = SortUtil.parseSort(request.getSortBy());
+        Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sortBy);
+        Specification<Customer> specification = new GenericSpecificationBuilder<Customer>()
+                .withLike("name", request.getQuery())
+                .withLike("phoneNumber", request.getQuery())
+                .build();
+        Page<Customer> menusPage = customerRepository.findAll(specification, pageable);
 
-        Sort sortBy = SortUtil.parseSort(sort);
-
-        Pageable pageRequest = PageRequest.of((page -1), size, sortBy);
-
-        Page<Customer> menus = customerRepository.findAll(pageRequest);
-
-        return menus.map(new Function<Customer, CustomerResponse>() {
-            @Override
-            public CustomerResponse apply(Customer customer) {
-                return toCustomerResponse(customer);
-            }
-        });
+        return menusPage.map(customer -> toCustomerResponse(customer));
     }
 
     private Customer getOne(String id) {
