@@ -11,6 +11,6 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-public class SearchCustomerRequest extends PagingAndSortingRequest {
+public class SearchCommonRequest extends PagingAndSortingRequest {
     private String query;
 }

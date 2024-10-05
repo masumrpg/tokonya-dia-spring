@@ -3,8 +3,6 @@ package org.enigma.tokonyadia_api.dto.response;
 import lombok.*;
 import org.enigma.tokonyadia_api.entity.Store;
 
-import java.util.List;
-
 @Getter
 @Setter
 @AllArgsConstructor

@@ -1,5 +1,6 @@
 package org.enigma.tokonyadia_api.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.enigma.tokonyadia_api.constant.Constant;
@@ -20,14 +21,15 @@ public class Transaction {
     private String id;
 
     @ManyToOne()
-    @JoinColumn(name = "customer_id")
-    private Customer customerId;
+    @JoinColumn(name = "customer_id", nullable = false)
+    private Customer customer;
 
     @Column(name = "transaction_date", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime transactionDate;
 
-    @OneToMany(mappedBy = "transaction", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "transaction", cascade = { CascadeType.PERSIST, CascadeType.REMOVE }, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JsonManagedReference
     private List<TransactionDetail> transactionDetails;
 
     @PrePersist

@@ -16,13 +16,13 @@ public class Store {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @Column(name = "siup", unique = true, nullable = false)
-    private String siup;
-
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = false, length = 150)
     private String name;
 
-    @Column(name = "phone_number", unique = true, nullable = false)
+    @Column(name = "siup", unique = true, nullable = false, length = 150)
+    private String siup;
+
+    @Column(name = "phone_number", unique = true, nullable = false, length = 15)
     private String phoneNumber;
 
     @Column(name = "address", nullable = false)

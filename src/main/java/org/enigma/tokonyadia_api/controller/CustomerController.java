@@ -2,9 +2,9 @@ package org.enigma.tokonyadia_api.controller;
 
 import org.enigma.tokonyadia_api.constant.Constant;
 import org.enigma.tokonyadia_api.dto.request.CustomerRequest;
-import org.enigma.tokonyadia_api.dto.request.SearchCustomerRequest;
+import org.enigma.tokonyadia_api.dto.request.SearchCommonRequest;
 import org.enigma.tokonyadia_api.dto.response.CustomerResponse;
-import org.enigma.tokonyadia_api.service.impl.CustomerServiceImpl;
+import org.enigma.tokonyadia_api.service.CustomerService;
 import org.enigma.tokonyadia_api.utils.ResponseUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(Constant.CUSTOMER_API)
 public class CustomerController {
-    private final CustomerServiceImpl customerServiceImpl;
+    private final CustomerService customerServiceImpl;
 
-    public CustomerController(CustomerServiceImpl customerServiceImpl) {
+    public CustomerController(CustomerService customerServiceImpl) {
         this.customerServiceImpl = customerServiceImpl;
     }
 
@@ -51,13 +51,13 @@ public class CustomerController {
             @RequestParam(name = "sort", required = false) String sort,
             @RequestParam(name = "q", required = false) String query
     ) {
-        SearchCustomerRequest searchCustomerRequest = SearchCustomerRequest.builder()
+        SearchCommonRequest searchCommonRequest = SearchCommonRequest.builder()
                 .size(size)
                 .page(page)
                 .sortBy(sort)
                 .query(query)
                 .build();
-        Page<CustomerResponse> customerResponsePage = customerServiceImpl.getAll(searchCustomerRequest);
-        return ResponseUtil.buildResponsePage(HttpStatus.OK, Constant.SUCCESS_GET_CUSTOMER, customerResponsePage);
+        Page<CustomerResponse> customerResponsePage = customerServiceImpl.getAll(searchCommonRequest);
+        return ResponseUtil.buildResponsePage(HttpStatus.OK, Constant.SUCCESS_GET_ALL_CUSTOMER, customerResponsePage);
     }
 }

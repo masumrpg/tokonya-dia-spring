@@ -1,12 +1,12 @@
 package org.enigma.tokonyadia_api.service.impl;
 
 import org.enigma.tokonyadia_api.dto.request.CustomerRequest;
-import org.enigma.tokonyadia_api.dto.request.SearchCustomerRequest;
+import org.enigma.tokonyadia_api.dto.request.SearchCommonRequest;
 import org.enigma.tokonyadia_api.dto.response.CustomerResponse;
 import org.enigma.tokonyadia_api.entity.Customer;
 import org.enigma.tokonyadia_api.repository.CustomerRepository;
 import org.enigma.tokonyadia_api.service.CustomerService;
-import org.enigma.tokonyadia_api.specification.GenericSpecificationBuilder;
+import org.enigma.tokonyadia_api.specification.FilterSpecificationBuilder;
 import org.enigma.tokonyadia_api.utils.SortUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,9 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.awt.*;
 import java.util.Optional;
-import java.util.function.Function;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
@@ -70,16 +68,16 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Page<CustomerResponse> getAll(SearchCustomerRequest request) {
+    public Page<CustomerResponse> getAll(SearchCommonRequest request) {
         Sort sortBy = SortUtil.parseSort(request.getSortBy());
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sortBy);
-        Specification<Customer> specification = new GenericSpecificationBuilder<Customer>()
+        Specification<Customer> specification = new FilterSpecificationBuilder<Customer>()
                 .withLike("name", request.getQuery())
-                .withLike("phoneNumber", request.getQuery())
+                .withEqual("phoneNumber", request.getQuery())
                 .build();
-        Page<Customer> menusPage = customerRepository.findAll(specification, pageable);
+        Page<Customer> resultPage = customerRepository.findAll(specification, pageable);
 
-        return menusPage.map(customer -> toCustomerResponse(customer));
+        return resultPage.map(customer -> toCustomerResponse(customer));
     }
 
     private Customer getOne(String id) {

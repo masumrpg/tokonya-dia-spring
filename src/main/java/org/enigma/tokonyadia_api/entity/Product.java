@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.enigma.tokonyadia_api.constant.Constant;
 
-import java.util.List;
-
 @Entity
 @Setter
 @Getter
@@ -18,7 +16,7 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = false, length = 150)
     private String name;
 
     @Column(name = "description", nullable = false)
@@ -31,6 +29,6 @@ public class Product {
     private Integer stock;
 
     @ManyToOne()
-    @JoinColumn(name = "store_id")
+    @JoinColumn(name = "store_id", nullable = false)
     private Store store;
 }

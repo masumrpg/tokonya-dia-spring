@@ -1,6 +1,7 @@
 package org.enigma.tokonyadia_api.utils;
 
 import org.enigma.tokonyadia_api.dto.response.CommonResponse;
+import org.enigma.tokonyadia_api.dto.response.CommonWithPaggingResponse;
 import org.enigma.tokonyadia_api.dto.response.PagingResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -10,11 +11,11 @@ import java.util.List;
 
 public class ResponseUtil {
     public static <T> ResponseEntity<CommonResponse<T>> buildCommonResponse(HttpStatus httpStatus, String message,T data) {
-        CommonResponse<T> commonResponse = new CommonResponse<>(httpStatus.value(), message, data, null);
+        CommonResponse<T> commonResponse = new CommonResponse<>(httpStatus.value(), message, data);
         return ResponseEntity.status(httpStatus).body(commonResponse);
     }
 
-    public static <T> ResponseEntity<CommonResponse<?>> buildResponsePage(
+    public static <T> ResponseEntity<CommonWithPaggingResponse<?>> buildResponsePage(
             HttpStatus httpStatus,
             String message,
             Page<T> page
@@ -26,7 +27,7 @@ public class ResponseUtil {
                 .size(page.getSize())
                 .build();
 
-        CommonResponse<List<T>> response = new CommonResponse<>(
+        CommonWithPaggingResponse<List<T>> response = new CommonWithPaggingResponse<>(
                 httpStatus.value(),
                 message,
                 page.getContent(),

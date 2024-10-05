@@ -1,6 +1,7 @@
 package org.enigma.tokonyadia_api.service.impl;
 
 import org.enigma.tokonyadia_api.dto.request.ProductRequest;
+import org.enigma.tokonyadia_api.dto.request.SearchWithGteLtaRequest;
 import org.enigma.tokonyadia_api.dto.response.ProductResponse;
 import org.enigma.tokonyadia_api.dto.response.StoreResponse;
 import org.enigma.tokonyadia_api.entity.Product;
@@ -8,17 +9,18 @@ import org.enigma.tokonyadia_api.entity.Store;
 import org.enigma.tokonyadia_api.repository.ProductRepository;
 import org.enigma.tokonyadia_api.service.ProductService;
 import org.enigma.tokonyadia_api.service.StoreService;
+import org.enigma.tokonyadia_api.specification.FilterSpecificationBuilder;
 import org.enigma.tokonyadia_api.utils.SortUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
-import java.util.function.Function;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -82,21 +84,17 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Page<ProductResponse> getAll(Integer page, Integer size, String sort) {
-        if (page <= 0) page = 1;
+    public Page<ProductResponse> getAll(SearchWithGteLtaRequest request) {
+        Sort sortBy = SortUtil.parseSort(request.getSortBy());
+        Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sortBy);
+        Specification<Product> specification = new FilterSpecificationBuilder<Product>()
+                .withLike("name", request.getQuery())
+                .withGreaterThanOrEqualTo("price", request.getMinValue())
+                .withLessThanOrEqualTo("price", request.getMaxValue())
+                .build();
+        Page<Product> resultPage = productRepository.findAll(specification, pageable);
 
-        Sort sortBy = SortUtil.parseSort(sort);
-
-        Pageable pageRequest = PageRequest.of((page -1), size, sortBy);
-
-        Page<Product> menus = productRepository.findAll(pageRequest);
-
-        return menus.map(new Function<Product, ProductResponse>() {
-            @Override
-            public ProductResponse apply(Product product) {
-                return toProductResponse(product);
-            }
-        });
+        return resultPage.map(product -> toProductResponse(product));
     }
 
     private Product getOne(String id) {

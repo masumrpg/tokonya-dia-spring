@@ -1,6 +1,7 @@
 package org.enigma.tokonyadia_api.dto.response;
 
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
