@@ -1,5 +1,6 @@
 package org.enigma.tokonyadia_api.service.impl;
 
+import lombok.AllArgsConstructor;
 import org.enigma.tokonyadia_api.dto.request.CustomerRequest;
 import org.enigma.tokonyadia_api.dto.request.SearchCommonRequest;
 import org.enigma.tokonyadia_api.dto.response.CustomerResponse;
@@ -8,7 +9,6 @@ import org.enigma.tokonyadia_api.repository.CustomerRepository;
 import org.enigma.tokonyadia_api.service.CustomerService;
 import org.enigma.tokonyadia_api.specification.FilterSpecificationBuilder;
 import org.enigma.tokonyadia_api.utils.SortUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,14 +20,12 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
+import static org.enigma.tokonyadia_api.utils.MapperUtil.toCustomerResponse;
+
+@AllArgsConstructor
 @Service
 public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepository customerRepository;
-
-    @Autowired
-    public CustomerServiceImpl(CustomerRepository customerRepository) {
-        this.customerRepository = customerRepository;
-    }
 
     @Override
     public CustomerResponse create(CustomerRequest customerRequest) {
@@ -44,15 +42,24 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    public Customer getOneById(String id) {
+        Optional<Customer> byId = customerRepository.findById(id);
+        if (byId.isPresent()) {
+            return byId.get();
+        }
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer not found");
+    }
+
+    @Override
     public CustomerResponse getById(String id) {
-        return toCustomerResponse(getOne(id));
+        return toCustomerResponse(getOneById(id));
     }
 
     @Override
     public CustomerResponse update(String id, CustomerRequest customerRequest) {
         verifyByPhoneNumber(customerRequest.getPhoneNumber());
         verifyByEmail(customerRequest.getEmail());
-        Customer customer = getOne(id);
+        Customer customer = getOneById(id);
         customer.setName(customerRequest.getName());
         customer.setPhoneNumber(customerRequest.getPhoneNumber());
         customer.setEmail(customerRequest.getEmail());
@@ -63,7 +70,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public void delete(String id) {
-        Customer customer = getOne(id);
+        Customer customer = getOneById(id);
         customerRepository.delete(customer);
     }
 
@@ -80,14 +87,6 @@ public class CustomerServiceImpl implements CustomerService {
         return resultPage.map(customer -> toCustomerResponse(customer));
     }
 
-    private Customer getOne(String id) {
-        Optional<Customer> byId = customerRepository.findById(id);
-        if (byId.isPresent()) {
-            return byId.get();
-        }
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer not found");
-    }
-
     private void verifyByPhoneNumber(String phoneNumber) {
         Optional<Customer> byPhone = customerRepository.findByPhoneNumber(phoneNumber);
         if (byPhone.isPresent()) {
@@ -100,15 +99,5 @@ public class CustomerServiceImpl implements CustomerService {
         if (byEmail.isPresent()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Email with " + email + " already exists!");
         }
-    }
-
-    private CustomerResponse toCustomerResponse(Customer customer) {
-        return CustomerResponse.builder()
-                .id(customer.getId())
-                .name(customer.getName())
-                .address(customer.getAddress())
-                .phoneNumber(customer.getPhoneNumber())
-                .email(customer.getEmail())
-                .build();
     }
 }

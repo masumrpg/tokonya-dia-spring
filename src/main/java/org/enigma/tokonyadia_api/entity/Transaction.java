@@ -29,7 +29,6 @@ public class Transaction {
     private LocalDateTime transactionDate;
 
     @OneToMany(mappedBy = "transaction", cascade = { CascadeType.PERSIST, CascadeType.REMOVE }, fetch = FetchType.LAZY, orphanRemoval = true)
-    @JsonManagedReference
     private List<TransactionDetail> transactionDetails;
 
     @PrePersist

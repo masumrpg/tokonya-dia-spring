@@ -1,5 +1,6 @@
 package org.enigma.tokonyadia_api.service.impl;
 
+import lombok.AllArgsConstructor;
 import org.enigma.tokonyadia_api.dto.request.SearchCommonRequest;
 import org.enigma.tokonyadia_api.dto.request.StoreRequest;
 import org.enigma.tokonyadia_api.dto.response.StoreResponse;
@@ -19,13 +20,12 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
+import static org.enigma.tokonyadia_api.utils.MapperUtil.toStoreResponse;
+
+@AllArgsConstructor
 @Service
 public class StoreServiceImpl implements StoreService {
     private final StoreRepository storeRepository;
-
-    public StoreServiceImpl(StoreRepository storeRepository) {
-        this.storeRepository = storeRepository;
-    }
 
     @Override
     public StoreResponse create(StoreRequest storeRequest) {
@@ -43,14 +43,14 @@ public class StoreServiceImpl implements StoreService {
 
     @Override
     public StoreResponse getById(String id) {
-        return toStoreResponse(getOne(id));
+        return toStoreResponse(getOneById(id));
     }
 
     @Override
     public StoreResponse update(String id, StoreRequest storeRequest) {
         verifyBySiup(storeRequest.getSiup());
         verifyByPhoneNumber(storeRequest.getPhoneNumber());
-        Store store = getOne(id);
+        Store store = getOneById(id);
         store.setName(storeRequest.getName());
         store.setPhoneNumber(storeRequest.getPhoneNumber());
         store.setSiup(storeRequest.getSiup());
@@ -60,8 +60,17 @@ public class StoreServiceImpl implements StoreService {
     }
 
     @Override
+    public Store getOneById(String id) {
+        Optional<Store> byId = storeRepository.findById(id);
+        if (byId.isPresent()) {
+            return byId.get();
+        }
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Store not found");
+    }
+
+    @Override
     public void delete(String id) {
-        Store store = getOne(id);
+        Store store = getOneById(id);
         storeRepository.delete(store);
     }
 
@@ -91,23 +100,5 @@ public class StoreServiceImpl implements StoreService {
         if (byPhone.isPresent()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Phone whith " + email + " already exist!");
         }
-    }
-
-    private Store getOne(String id) {
-        Optional<Store> byId = storeRepository.findById(id);
-        if (byId.isPresent()) {
-            return byId.get();
-        }
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Store not found");
-    }
-
-    private StoreResponse toStoreResponse(Store store) {
-        return StoreResponse.builder()
-                .id(store.getId())
-                .name(store.getName())
-                .siup(store.getSiup())
-                .address(store.getAddress())
-                .phoneNumber(store.getPhoneNumber())
-                .build();
     }
 }

@@ -7,7 +7,7 @@ import org.enigma.tokonyadia_api.entity.Transaction;
 import java.util.List;
 
 public interface TransactionService {
-    void create(TransactionRequest request);
+    TransactionResponse create(TransactionRequest request);
     TransactionResponse getById(String id);
     List<Transaction> getAll();
 }

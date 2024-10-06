@@ -1,5 +1,6 @@
 package org.enigma.tokonyadia_api.service.impl;
 
+import lombok.AllArgsConstructor;
 import org.enigma.tokonyadia_api.dto.request.ProductRequest;
 import org.enigma.tokonyadia_api.dto.request.SearchWithGteLtaRequest;
 import org.enigma.tokonyadia_api.dto.response.ProductResponse;
@@ -22,15 +23,13 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
+import static org.enigma.tokonyadia_api.utils.MapperUtil.toProductResponse;
+
+@AllArgsConstructor
 @Service
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final StoreService storeService;
-
-    public ProductServiceImpl(ProductRepository productRepository, StoreService storeService) {
-        this.productRepository = productRepository;
-        this.storeService = storeService;
-    }
 
     @Override
     public ProductResponse create(ProductRequest productRequest) {
@@ -54,8 +53,17 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public Product getOneById(String id) {
+        Optional<Product> byId = productRepository.findById(id);
+        if (byId.isPresent()) {
+            return byId.get();
+        }
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found");
+    }
+
+    @Override
     public ProductResponse getById(String id) {
-        return toProductResponse(getOne(id));
+        return toProductResponse(getOneById(id));
     }
 
     @Override
@@ -68,7 +76,7 @@ public class ProductServiceImpl implements ProductService {
                 .address(storeResponse.getAddress())
                 .build();
 
-        Product existingProduct = getOne(id);
+        Product existingProduct = getOneById(id);
         existingProduct.setName(productRequest.getName());
         existingProduct.setDescription(productRequest.getDescription());
         existingProduct.setPrice(productRequest.getPrice());
@@ -79,8 +87,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void delete(String id) {
-        Product product = getOne(id);
-        productRepository.delete(product);
+        productRepository.delete(getOneById(id));
     }
 
     @Override
@@ -95,24 +102,5 @@ public class ProductServiceImpl implements ProductService {
         Page<Product> resultPage = productRepository.findAll(specification, pageable);
 
         return resultPage.map(product -> toProductResponse(product));
-    }
-
-    private Product getOne(String id) {
-        Optional<Product> byId = productRepository.findById(id);
-        if (byId.isPresent()) {
-            return byId.get();
-        }
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found");
-    }
-
-    private ProductResponse toProductResponse(Product product) {
-        return ProductResponse.builder()
-                .id(product.getId())
-                .name(product.getName())
-                .description(product.getDescription())
-                .price(product.getPrice())
-                .stock(product.getStock())
-                .store(product.getStore())
-                .build();
     }
 }

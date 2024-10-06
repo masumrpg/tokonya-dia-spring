@@ -1,11 +1,8 @@
 package org.enigma.tokonyadia_api.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.enigma.tokonyadia_api.constant.Constant;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Setter
@@ -21,7 +18,6 @@ public class TransactionDetail {
 
     @ManyToOne
     @JoinColumn(name = "transaction_id", nullable = false)
-    @JsonIgnore
     private Transaction transaction;
 
     @ManyToOne
