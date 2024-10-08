@@ -8,6 +8,7 @@ import org.enigma.tokonyadia_api.entity.Store;
 import org.enigma.tokonyadia_api.repository.StoreRepository;
 import org.enigma.tokonyadia_api.service.StoreService;
 import org.enigma.tokonyadia_api.specification.FilterSpecificationBuilder;
+import org.enigma.tokonyadia_api.utils.MapperUtil;
 import org.enigma.tokonyadia_api.utils.SortUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -85,7 +86,7 @@ public class StoreServiceImpl implements StoreService {
                 .build();
         Page<Store> resultPage = storeRepository.findAll(specification, pageable);
 
-        return resultPage.map(store -> toStoreResponse(store));
+        return resultPage.map(MapperUtil::toStoreResponse);
     }
 
     private void verifyBySiup(String siup) {

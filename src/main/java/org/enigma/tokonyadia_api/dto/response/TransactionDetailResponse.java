@@ -14,8 +14,9 @@ import java.util.List;
 @Builder
 @ToString
 public class TransactionDetailResponse {
-    private String name;
+    private String productId;
+    private String productName;
     private Long price;
     private Integer quantity;
-    private String discount; // for future feature
+//    private String discount; // for future feature
 }

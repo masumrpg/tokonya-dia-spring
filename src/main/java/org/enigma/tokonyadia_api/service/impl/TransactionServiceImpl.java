@@ -2,16 +2,25 @@ package org.enigma.tokonyadia_api.service.impl;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.enigma.tokonyadia_api.dto.request.SearchCommonRequest;
 import org.enigma.tokonyadia_api.dto.request.TransactionRequest;
-import org.enigma.tokonyadia_api.dto.response.TransactionDetailResponse;
 import org.enigma.tokonyadia_api.dto.response.TransactionResponse;
 import org.enigma.tokonyadia_api.entity.Customer;
+import org.enigma.tokonyadia_api.entity.Store;
 import org.enigma.tokonyadia_api.entity.Transaction;
 import org.enigma.tokonyadia_api.entity.TransactionDetail;
 import org.enigma.tokonyadia_api.repository.TransactionRepository;
 import org.enigma.tokonyadia_api.service.CustomerService;
 import org.enigma.tokonyadia_api.service.TransactionDetailService;
 import org.enigma.tokonyadia_api.service.TransactionService;
+import org.enigma.tokonyadia_api.specification.FilterSpecificationBuilder;
+import org.enigma.tokonyadia_api.utils.MapperUtil;
+import org.enigma.tokonyadia_api.utils.SortUtil;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -20,8 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.enigma.tokonyadia_api.utils.MapperUtil.toTransactionDetailResponse;
-import static org.enigma.tokonyadia_api.utils.MapperUtil.toTransactionResponse;
+import static org.enigma.tokonyadia_api.utils.MapperUtil.*;
 
 @AllArgsConstructor
 @Service
@@ -30,8 +38,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final TransactionDetailService transactionDetailService;
     private final TransactionRepository transactionRepository;
 
-    // FIXME make this cant response transaction
-    @Transactional
+    @Transactional(rollbackOn = Exception.class)
     @Override
     public TransactionResponse create(TransactionRequest request) {
         // get customer
@@ -48,29 +55,32 @@ public class TransactionServiceImpl implements TransactionService {
 
         // Response
         newTransaction.setTransactionDetails(transactionDetailList);
-        List<TransactionDetailResponse> transactionDetailResponses = new ArrayList<>();
-        for (TransactionDetail transactionDetail : transactionDetailList) {
-            transactionDetailResponses.add(toTransactionDetailResponse(transactionDetail));
-        }
-        return toTransactionResponse(newTransaction, transactionDetailResponses);
+        return toTransactionResponse(newTransaction);
     }
 
     @Override
     public TransactionResponse getById(String id) {
-        List<TransactionDetailResponse> transactionResponseList = new ArrayList<>();
         Optional<Transaction> byId = transactionRepository.findById(id);
         if (byId.isPresent()) {
             Transaction transaction = byId.get();
-            for (TransactionDetail transactionDetail : transaction.getTransactionDetails()) {
-                transactionResponseList.add(toTransactionDetailResponse(transactionDetail));
-            }
-            return toTransactionResponse(transaction, transactionResponseList);
+            List<TransactionDetail> transactionResponseList = new ArrayList<>(transaction.getTransactionDetails());
+            transaction.setTransactionDetails(transactionResponseList);
+            return toTransactionResponse(transaction);
         }
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found");
     }
 
     @Override
-    public List<Transaction> getAll() {
-        return List.of();
+    public Page<TransactionResponse> getAll(SearchCommonRequest request) {
+        Sort sortBy = SortUtil.parseSort(request.getSortBy());
+        Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sortBy);
+        Specification<Transaction> specification = new FilterSpecificationBuilder<Transaction>()
+                .withLike("name", request.getQuery())
+                .withEqual("siup", request.getQuery())
+                .withEqual("phoneNumber", request.getQuery())
+                .build();
+        Page<Transaction> resultPage = transactionRepository.findAll(specification, pageable);
+
+        return resultPage.map(MapperUtil::toTransactionResponse);
     }
 }

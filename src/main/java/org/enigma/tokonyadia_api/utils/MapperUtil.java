@@ -3,6 +3,7 @@ package org.enigma.tokonyadia_api.utils;
 import org.enigma.tokonyadia_api.dto.response.*;
 import org.enigma.tokonyadia_api.entity.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MapperUtil {
@@ -39,20 +40,33 @@ public class MapperUtil {
 
     public static TransactionDetailResponse toTransactionDetailResponse(TransactionDetail transactionDetail) {
         return TransactionDetailResponse.builder()
-                .name(transactionDetail.getProduct().getName())
+                .productId(transactionDetail.getId())
+                .productName(transactionDetail.getProduct().getName())
                 .price(transactionDetail.getProduct().getPrice())
                 .quantity(transactionDetail.getQuantity())
                 .build();
     }
 
-    public static TransactionResponse toTransactionResponse(Transaction transaction, List<TransactionDetailResponse> transactionDetailResponse) {
+    public static List<TransactionDetailResponse> toTransactionDetailListResponse(List<TransactionDetail> transactionDetail) {
+        List<TransactionDetailResponse> transactionDetailResponses = new ArrayList<>();
+        transactionDetail.forEach(transactionDetailResponse -> transactionDetailResponses.add(toTransactionDetailResponse(transactionDetailResponse)));
+        return transactionDetailResponses;
+    }
+
+    public static TransactionResponse toTransactionResponse(Transaction transaction) {
         return TransactionResponse.builder()
                 .id(transaction.getId())
                 .customerName(transaction.getCustomer().getName())
                 .customerPhoneNumber(transaction.getCustomer().getPhoneNumber())
                 .storeName(transaction.getTransactionDetails().get(0).getProduct().getStore().getName())
                 .transactionDate(transaction.getTransactionDate())
-                .transactionsDetails(transactionDetailResponse)
+                .transactionsDetails(toTransactionDetailListResponse(transaction.getTransactionDetails()))
                 .build();
+    }
+
+    public static List<TransactionResponse> toTransactionListResponse(List<Transaction> transactions) {
+        List<TransactionResponse> transactionResponses = new ArrayList<>();
+        transactions.forEach(transactionResponse -> transactionResponses.add(toTransactionResponse(transactionResponse)));
+        return transactionResponses;
     }
 }
