@@ -69,4 +69,12 @@ public class MapperUtil {
         transactions.forEach(transactionResponse -> transactionResponses.add(toTransactionResponse(transactionResponse)));
         return transactionResponses;
     }
+
+    public static UserResponse toUserResponse(UserAccount userAccount) {
+        return UserResponse.builder()
+                .id(userAccount.getId())
+                .username(userAccount.getUsername())
+                .role(userAccount.getRole().getDescription())
+                .build();
+    }
 }

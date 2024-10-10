@@ -27,4 +27,8 @@ public class Store {
 
     @Column(name = "address", nullable = false)
     private String address;
+
+    @ManyToOne
+    @JoinColumn(name = "user_account_id")
+    private UserAccount userAccount;
 }

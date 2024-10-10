@@ -2,6 +2,7 @@ package org.enigma.tokonyadia_api.constant;
 
 public class Constant {
     // Table
+    public static final String USER_ACCOUNT_TABLE = "m_user_account";
     public static final String CUSTOMER_TABLE = "m_customer";
     public static final String STORE_TABLE = "m_store";
     public static final String PRODUCT_TABLE = "m_product";
@@ -9,6 +10,8 @@ public class Constant {
     public static final String TRANSACTION_DETAIL_TABLE = "t_transaction_detail";
 
     // API
+    public static final String USER_API = "/api/users";
+    public static final String AUTH_API = "/api/auth";
     public static final String CUSTOMER_API = "/api/customers";
     public static final String PRODUCT_API = "/api/products";
     public static final String STORE_API = "/api/stores";
@@ -16,6 +19,10 @@ public class Constant {
     public static final String TRANSACTION_DETAIL_API = "/api/transaction_details";
 
     // Message
+    // user
+    public static final String SUCCESS_CREATE_USER = "Successfully created user";
+    public static final String SUCCESS_LOGIN = "Success login";
+
     // customer
     public static final String SUCCESS_CREATED_CUSTOMER = "Successfully created customer";
     public static final String SUCCESS_GET_CUSTOMER = "Successfully get customer";
@@ -37,7 +44,10 @@ public class Constant {
     // transaction
     public static final String SUCCESS_CREATED_TRANSACTION = "Successfully created transaction";
     public static final String SUCCESS_GET_TRANSACTION = "Successfully get transaction";
-//    public static final String SUCCESS_UPDATE_PRODUCT = "Successfully update product";
-//    public static final String SUCCESS_DELETE_PRODUCT = "Successfully delete product";
-//    public static final String SUCCESS_GET_ALL_PRODUCT = "Successfully get products";
+
+    // Error
+    // user
+    public static final String ERROR_USERNAME_DUPLICATE = "Username already exists";
+    public static final String ERROR_ROLE_NOT_FOUND = "Role not found";
+    public static final String INVALID_CREDENTIALS = "Invalid credentials";
 }

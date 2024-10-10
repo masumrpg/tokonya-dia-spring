@@ -1,6 +1,7 @@
 package org.enigma.tokonyadia_api.controller;
 
 import org.enigma.tokonyadia_api.constant.Constant;
+import org.enigma.tokonyadia_api.dto.request.CustomerCreateRequest;
 import org.enigma.tokonyadia_api.dto.request.CustomerRequest;
 import org.enigma.tokonyadia_api.dto.request.SearchCommonRequest;
 import org.enigma.tokonyadia_api.dto.response.CustomerResponse;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(Constant.CUSTOMER_API)
+@CrossOrigin(origins = "http://localhost:5173")
 public class CustomerController {
     private final CustomerService customerServiceImpl;
 
@@ -21,7 +23,7 @@ public class CustomerController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createCustomer(@RequestBody CustomerRequest request) {
+    public ResponseEntity<?> createCustomer(@RequestBody CustomerCreateRequest request) {
         CustomerResponse customerResponse = customerServiceImpl.create(request);
         return ResponseUtil.buildCommonResponse(HttpStatus.CREATED, Constant.SUCCESS_CREATED_CUSTOMER, customerResponse);
     }
