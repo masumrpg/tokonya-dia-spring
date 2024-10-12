@@ -11,7 +11,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-public class SearchWithGteLtaRequest extends SearchCommonRequest {
+public class SearchWithMinMaxRequest extends SearchCommonRequest {
     private Long minValue;
     private Long maxValue;
 }

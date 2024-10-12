@@ -4,7 +4,11 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.enigma.tokonyadia_api.constant.Constant;
 import org.enigma.tokonyadia_api.constant.UserRole;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Collection;
 import java.util.List;
 
 @Entity
@@ -14,7 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserAccount {
+public class UserAccount implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
@@ -31,4 +35,10 @@ public class UserAccount {
 
     @OneToMany(orphanRemoval = true, mappedBy = "userAccount")
     private List<Store> stores;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        List<UserRole> myRoles = List.of(role);
+        return myRoles.stream().map(userRole -> new SimpleGrantedAuthority(userRole.name())).toList();
+    }
 }

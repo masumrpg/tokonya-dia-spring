@@ -6,7 +6,6 @@ import org.enigma.tokonyadia_api.dto.request.SearchCommonRequest;
 import org.enigma.tokonyadia_api.dto.request.TransactionRequest;
 import org.enigma.tokonyadia_api.dto.response.TransactionResponse;
 import org.enigma.tokonyadia_api.entity.Customer;
-import org.enigma.tokonyadia_api.entity.Store;
 import org.enigma.tokonyadia_api.entity.Transaction;
 import org.enigma.tokonyadia_api.entity.TransactionDetail;
 import org.enigma.tokonyadia_api.repository.TransactionRepository;

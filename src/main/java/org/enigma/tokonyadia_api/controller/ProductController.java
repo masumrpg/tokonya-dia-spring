@@ -1,8 +1,9 @@
 package org.enigma.tokonyadia_api.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.enigma.tokonyadia_api.constant.Constant;
 import org.enigma.tokonyadia_api.dto.request.ProductRequest;
-import org.enigma.tokonyadia_api.dto.request.SearchWithGteLtaRequest;
+import org.enigma.tokonyadia_api.dto.request.SearchWithMinMaxRequest;
 import org.enigma.tokonyadia_api.dto.response.ProductResponse;
 import org.enigma.tokonyadia_api.service.ProductService;
 import org.enigma.tokonyadia_api.utils.ResponseUtil;
@@ -13,12 +14,9 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(Constant.PRODUCT_API)
+@RequiredArgsConstructor
 public class ProductController {
     private final ProductService productServiceImpl;
-
-    public ProductController(ProductService productServiceImpl) {
-        this.productServiceImpl = productServiceImpl;
-    }
 
     @PostMapping
     public ResponseEntity<?> createProduct(@RequestBody ProductRequest product) {
@@ -53,7 +51,7 @@ public class ProductController {
             @RequestParam(name = "minPrice", required = false) Long minPrice,
             @RequestParam(name = "maxPrice", required = false) Long maxPrice
     ) {
-        SearchWithGteLtaRequest searchWithGteLtaRequest = SearchWithGteLtaRequest.builder()
+        SearchWithMinMaxRequest searchWithMinMaxRequest = SearchWithMinMaxRequest.builder()
                 .page(page)
                 .size(size)
                 .sortBy(sort)
@@ -61,7 +59,7 @@ public class ProductController {
                 .minValue(minPrice)
                 .maxValue(maxPrice)
                 .build();
-        Page<ProductResponse> productResponsePage = productServiceImpl.getAll(searchWithGteLtaRequest);
+        Page<ProductResponse> productResponsePage = productServiceImpl.getAll(searchWithMinMaxRequest);
         return ResponseUtil.buildResponsePage(HttpStatus.OK, Constant.SUCCESS_GET_ALL_PRODUCT, productResponsePage);
     }
 }

@@ -1,8 +1,8 @@
 package org.enigma.tokonyadia_api.service.impl;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.enigma.tokonyadia_api.dto.request.ProductRequest;
-import org.enigma.tokonyadia_api.dto.request.SearchWithGteLtaRequest;
+import org.enigma.tokonyadia_api.dto.request.SearchWithMinMaxRequest;
 import org.enigma.tokonyadia_api.dto.response.ProductResponse;
 import org.enigma.tokonyadia_api.dto.response.StoreResponse;
 import org.enigma.tokonyadia_api.entity.Product;
@@ -11,6 +11,7 @@ import org.enigma.tokonyadia_api.repository.ProductRepository;
 import org.enigma.tokonyadia_api.service.ProductService;
 import org.enigma.tokonyadia_api.service.StoreService;
 import org.enigma.tokonyadia_api.specification.FilterSpecificationBuilder;
+import org.enigma.tokonyadia_api.utils.MapperUtil;
 import org.enigma.tokonyadia_api.utils.SortUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,8 +26,8 @@ import java.util.Optional;
 
 import static org.enigma.tokonyadia_api.utils.MapperUtil.toProductResponse;
 
-@AllArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final StoreService storeService;
@@ -91,7 +92,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Page<ProductResponse> getAll(SearchWithGteLtaRequest request) {
+    public Page<ProductResponse> getAll(SearchWithMinMaxRequest request) {
         Sort sortBy = SortUtil.parseSort(request.getSortBy());
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sortBy);
         Specification<Product> specification = new FilterSpecificationBuilder<Product>()
@@ -101,6 +102,6 @@ public class ProductServiceImpl implements ProductService {
                 .build();
         Page<Product> resultPage = productRepository.findAll(specification, pageable);
 
-        return resultPage.map(product -> toProductResponse(product));
+        return resultPage.map(MapperUtil::toProductResponse);
     }
 }

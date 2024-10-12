@@ -21,7 +21,7 @@ public class AuthController {
 
     @PostMapping(path = "/login")
     public ResponseEntity<?> login(@RequestBody AuthRequest request) {
-        LoginResponse logined = authService.login(request);
-        return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_LOGIN, logined);
+        LoginResponse login = authService.login(request);
+        return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_LOGIN, login);
     }
 }

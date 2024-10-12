@@ -1,6 +1,6 @@
 package org.enigma.tokonyadia_api.service.impl;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.enigma.tokonyadia_api.constant.UserRole;
 import org.enigma.tokonyadia_api.dto.request.CustomerCreateRequest;
 import org.enigma.tokonyadia_api.dto.request.CustomerRequest;
@@ -12,6 +12,7 @@ import org.enigma.tokonyadia_api.repository.CustomerRepository;
 import org.enigma.tokonyadia_api.service.CustomerService;
 import org.enigma.tokonyadia_api.service.UserService;
 import org.enigma.tokonyadia_api.specification.FilterSpecificationBuilder;
+import org.enigma.tokonyadia_api.utils.MapperUtil;
 import org.enigma.tokonyadia_api.utils.SortUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,8 +28,8 @@ import java.util.Optional;
 
 import static org.enigma.tokonyadia_api.utils.MapperUtil.toCustomerResponse;
 
-@AllArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepository customerRepository;
     private final UserService userService;
@@ -66,6 +67,7 @@ public class CustomerServiceImpl implements CustomerService {
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer not found");
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public CustomerResponse getById(String id) {
         return toCustomerResponse(getOneById(id));
@@ -84,6 +86,7 @@ public class CustomerServiceImpl implements CustomerService {
         return toCustomerResponse(customer);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void delete(String id) {
         Customer customer = getOneById(id);
@@ -100,7 +103,7 @@ public class CustomerServiceImpl implements CustomerService {
                 .build();
         Page<Customer> resultPage = customerRepository.findAll(specification, pageable);
 
-        return resultPage.map(customer -> toCustomerResponse(customer));
+        return resultPage.map(MapperUtil::toCustomerResponse);
     }
 
     private void checkCustomerByPhone(String phoneNumber) {

@@ -1,5 +1,6 @@
 package org.enigma.tokonyadia_api.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.enigma.tokonyadia_api.constant.Constant;
 import org.enigma.tokonyadia_api.dto.request.SearchCommonRequest;
 import org.enigma.tokonyadia_api.dto.request.TransactionRequest;
@@ -11,16 +12,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping(Constant.TRANSACTION_API)
+@RequiredArgsConstructor
 public class TransactionController {
     private final TransactionService transactionService;
-
-    public TransactionController(TransactionService transactionService) {
-        this.transactionService = transactionService;
-    }
 
     @PostMapping
     public ResponseEntity<?> createTransaction(@RequestBody TransactionRequest request) {

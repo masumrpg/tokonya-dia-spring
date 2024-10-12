@@ -1,6 +1,6 @@
 package org.enigma.tokonyadia_api.service.impl;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.enigma.tokonyadia_api.dto.request.SearchCommonRequest;
 import org.enigma.tokonyadia_api.dto.request.StoreRequest;
 import org.enigma.tokonyadia_api.dto.response.StoreResponse;
@@ -23,8 +23,9 @@ import java.util.Optional;
 
 import static org.enigma.tokonyadia_api.utils.MapperUtil.toStoreResponse;
 
-@AllArgsConstructor
+
 @Service
+@RequiredArgsConstructor
 public class StoreServiceImpl implements StoreService {
     private final StoreRepository storeRepository;
 

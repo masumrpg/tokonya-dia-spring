@@ -1,5 +1,6 @@
 package org.enigma.tokonyadia_api.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.enigma.tokonyadia_api.constant.Constant;
 import org.enigma.tokonyadia_api.dto.request.SearchCommonRequest;
 import org.enigma.tokonyadia_api.dto.request.StoreRequest;
@@ -13,12 +14,9 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(Constant.STORE_API)
+@RequiredArgsConstructor
 public class StoreController {
     private final StoreService storeService;
-
-    public StoreController(StoreService storeService) {
-        this.storeService = storeService;
-    }
 
     @PostMapping
     public ResponseEntity<?> createProduct(@RequestBody StoreRequest storeRequest) {
@@ -58,6 +56,6 @@ public class StoreController {
                 .query(query)
                 .build();
         Page<StoreResponse> customerResponsePage = storeService.getAll(searchCommonRequest);
-        return ResponseUtil.buildResponsePage(HttpStatus.OK, Constant.SUCCESS_GET_ALL_CUSTOMER, customerResponsePage);
+        return ResponseUtil.buildResponsePage(HttpStatus.OK, Constant.SUCCESS_GET_All_STORE, customerResponsePage);
     }
 }

@@ -1,6 +1,6 @@
 package org.enigma.tokonyadia_api.constant;
 
-public enum OrderStatus {
+public enum TransactionStatus {
     DRAFT,
     PENDING,
     CONFIRMED,

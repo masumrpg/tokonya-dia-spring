@@ -1,6 +1,6 @@
 package org.enigma.tokonyadia_api.service.impl;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.enigma.tokonyadia_api.dto.request.ProductRequest;
 import org.enigma.tokonyadia_api.dto.request.TransactionDetailRequest;
 import org.enigma.tokonyadia_api.entity.Product;
@@ -16,8 +16,8 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.List;
 
-@AllArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class TransactionDetailServiceImpl implements TransactionDetailService {
     private final ProductService productService;
     private final TransactionDetailRepository transactionDetailRepository;
