@@ -1,7 +1,6 @@
 package org.enigma.tokonyadia_api.dto.response;
 
 import lombok.*;
-import org.enigma.tokonyadia_api.entity.Store;
 
 @Getter
 @Setter
@@ -14,5 +13,6 @@ public class ProductResponse {
     private String description;
     private Long price;
     private Integer stock;
-    private Store store;
+    private String storeId;
+    private String productPromoId;
 }

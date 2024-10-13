@@ -1,11 +1,6 @@
 package org.enigma.tokonyadia_api.dto.response;
 
 import lombok.*;
-import org.enigma.tokonyadia_api.entity.Customer;
-import org.enigma.tokonyadia_api.entity.TransactionDetail;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Setter
@@ -13,7 +8,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @ToString
-public class TransactionDetailResponse {
+public class OrderDetailResponse {
     private String productId;
     private String productName;
     private Long price;

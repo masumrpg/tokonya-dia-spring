@@ -2,7 +2,7 @@ package org.enigma.tokonyadia_api.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.enigma.tokonyadia_api.constant.Constant;
-import org.enigma.tokonyadia_api.dto.request.CustomerCreateRequest;
+import org.enigma.tokonyadia_api.dto.request.RegisterCreateRequest;
 import org.enigma.tokonyadia_api.dto.request.CustomerRequest;
 import org.enigma.tokonyadia_api.dto.request.SearchCommonRequest;
 import org.enigma.tokonyadia_api.dto.response.CustomerResponse;
@@ -21,7 +21,7 @@ public class CustomerController {
     private final CustomerService customerService;
 
     @PostMapping
-    public ResponseEntity<?> createCustomer(@RequestBody CustomerCreateRequest request) {
+    public ResponseEntity<?> createCustomer(@RequestBody RegisterCreateRequest request) {
         CustomerResponse customerResponse = customerService.create(request);
         return ResponseUtil.buildCommonResponse(HttpStatus.CREATED, Constant.SUCCESS_CREATED_CUSTOMER, customerResponse);
     }
@@ -32,7 +32,7 @@ public class CustomerController {
         return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_GET_CUSTOMER, customerResponse);
     }
 
-    @PreAuthorize("hasRole('ADMIN') or (hasRole('CUSTOMER') and @permissionEvaluationServiceImpl.hasAccessToCustomer(#customerId, authentication.principal.id))")
+    @PreAuthorize("hasRole('SUPER_ADMIN') or ((hasRole('ADMIN') or hasRole('CUSTOMER')) and @permissionEvaluationServiceImpl.hasAccessToCustomer(#customerId, authentication.principal.id))")
     @PutMapping("/{customerId}")
     public ResponseEntity<?> updateCustomer(@PathVariable String customerId,@RequestBody CustomerRequest request) {
         CustomerResponse customerResponse = customerService.update(customerId, request);

@@ -9,16 +9,16 @@ import org.enigma.tokonyadia_api.constant.Constant;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = Constant.TRANSACTION_DETAIL_TABLE)
+@Table(name = Constant.ORDER_DETAIL_TABLE)
 @Builder
-public class TransactionDetail {
+public class OrderDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
     @ManyToOne
-    @JoinColumn(name = "transaction_id", nullable = false)
-    private Transaction transaction;
+    @JoinColumn(name = "order_id", nullable = false)
+    private Order order;
 
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)

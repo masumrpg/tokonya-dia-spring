@@ -2,15 +2,16 @@ package org.enigma.tokonyadia_api.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.enigma.tokonyadia_api.constant.UserRole;
-import org.enigma.tokonyadia_api.dto.request.CustomerCreateRequest;
 import org.enigma.tokonyadia_api.dto.request.CustomerRequest;
+import org.enigma.tokonyadia_api.dto.request.RegisterCreateRequest;
 import org.enigma.tokonyadia_api.dto.request.SearchCommonRequest;
+import org.enigma.tokonyadia_api.dto.request.UserRequest;
 import org.enigma.tokonyadia_api.dto.response.CustomerResponse;
 import org.enigma.tokonyadia_api.entity.Customer;
 import org.enigma.tokonyadia_api.entity.UserAccount;
 import org.enigma.tokonyadia_api.repository.CustomerRepository;
 import org.enigma.tokonyadia_api.service.CustomerService;
-import org.enigma.tokonyadia_api.service.UserService;
+import org.enigma.tokonyadia_api.service.UserAccountService;
 import org.enigma.tokonyadia_api.specification.FilterSpecificationBuilder;
 import org.enigma.tokonyadia_api.utils.MapperUtil;
 import org.enigma.tokonyadia_api.utils.SortUtil;
@@ -26,27 +27,29 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
-import static org.enigma.tokonyadia_api.utils.MapperUtil.toCustomerResponse;
+import static org.enigma.tokonyadia_api.utils.MapperUtil.*;
+import static org.enigma.tokonyadia_api.utils.Verify.checkCustomerByEmail;
+import static org.enigma.tokonyadia_api.utils.Verify.checkCustomerByPhone;
 
 @Service
 @RequiredArgsConstructor
 public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepository customerRepository;
-    private final UserService userService;
+    private final UserAccountService userAccountService;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public CustomerResponse create(CustomerCreateRequest request) {
+    public CustomerResponse create(RegisterCreateRequest request) {
         // verify
-        checkCustomerByEmail(request.getEmail());
-        checkCustomerByPhone(request.getPhoneNumber());
+        checkCustomerByEmail(request.getEmail(), customerRepository);
+        checkCustomerByPhone(request.getPhoneNumber(), customerRepository);
 
         UserAccount userAccount = UserAccount.builder()
                 .username(request.getUsername())
                 .password(request.getPassword())
                 .role(UserRole.ROLE_CUSTOMER)
                 .build();
-        userService.create(userAccount);
+        userAccountService.create(userAccount);
         Customer customer = Customer.builder()
                 .name(request.getName())
                 .email(request.getEmail())
@@ -55,6 +58,37 @@ public class CustomerServiceImpl implements CustomerService {
                 .build();
         customerRepository.saveAndFlush(customer);
         return toCustomerResponse(customer);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public CustomerResponse create(UserRequest request) {
+        // verify
+        checkCustomerByEmail(request.getEmail(), customerRepository);
+        checkCustomerByPhone(request.getPhoneNumber(), customerRepository);
+
+        UserAccount userAccount = UserAccount.builder()
+                .username(request.getUsername())
+                .password(request.getPassword())
+                .role(UserRole.findByDescription(request.getRole()))
+                .build();
+        userAccountService.create(userAccount);
+        Customer customer = Customer.builder()
+                .name(request.getName())
+                .email(request.getEmail())
+                .phoneNumber(request.getPhoneNumber())
+                .userAccount(userAccount)
+                .build();
+        customerRepository.saveAndFlush(customer);
+        return toCustomerResponse(customer);
+    }
+
+    @Override
+    public Customer create(Customer customer) {
+        checkCustomerByEmail(customer.getEmail(), customerRepository);
+        checkCustomerByPhone(customer.getPhoneNumber(), customerRepository);
+        customerRepository.saveAndFlush(customer);
+        return customer;
     }
 
     @Transactional(readOnly = true)
@@ -76,8 +110,8 @@ public class CustomerServiceImpl implements CustomerService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public CustomerResponse update(String id, CustomerRequest customerRequest) {
-        checkCustomerByPhone(customerRequest.getPhoneNumber());
-        checkCustomerByEmail(customerRequest.getEmail());
+        checkCustomerByPhone(customerRequest.getPhoneNumber(), customerRepository);
+        checkCustomerByEmail(customerRequest.getEmail(), customerRepository);
         Customer customer = getOneById(id);
         customer.setName(customerRequest.getName());
         customer.setPhoneNumber(customerRequest.getPhoneNumber());
@@ -105,19 +139,5 @@ public class CustomerServiceImpl implements CustomerService {
         Page<Customer> resultPage = customerRepository.findAll(specification, pageable);
 
         return resultPage.map(MapperUtil::toCustomerResponse);
-    }
-
-    private void checkCustomerByPhone(String phoneNumber) {
-        Optional<Customer> byPhone = customerRepository.findByPhoneNumber(phoneNumber);
-        if (byPhone.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Phone with " + phoneNumber + " already exists!");
-        }
-    }
-
-    private void checkCustomerByEmail(String email) {
-        Optional<Customer> byEmail = customerRepository.findByEmail(email);
-        if (byEmail.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email with " + email + " already exists!");
-        }
     }
 }

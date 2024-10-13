@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.enigma.tokonyadia_api.entity.UserAccount;
 import org.enigma.tokonyadia_api.service.JwtService;
-import org.enigma.tokonyadia_api.service.UserService;
+import org.enigma.tokonyadia_api.service.UserAccountService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,7 +24,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
-    private final UserService userService;
+    private final UserAccountService userAccountService;
 
     @Override
     protected void doFilterInternal(
@@ -39,7 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (token != null) {
                 String userId = jwtService.getUserId(token);
 
-                UserAccount userAccount = userService.getById(userId);
+                UserAccount userAccount = userAccountService.getById(userId);
 
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                         userAccount,

@@ -7,7 +7,7 @@ import org.enigma.tokonyadia_api.dto.request.UserRequest;
 import org.enigma.tokonyadia_api.dto.response.UserResponse;
 import org.enigma.tokonyadia_api.entity.UserAccount;
 import org.enigma.tokonyadia_api.repository.UserAccountRepository;
-import org.enigma.tokonyadia_api.service.UserService;
+import org.enigma.tokonyadia_api.service.UserAccountService;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -16,21 +16,23 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Optional;
-
 import static org.enigma.tokonyadia_api.utils.MapperUtil.toUserResponse;
+import static org.enigma.tokonyadia_api.utils.Verify.checkUserByUsername;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService {
+public class UserAccountServiceImpl implements UserAccountService {
     private final UserAccountRepository userAccountRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public UserResponse create(UserRequest request) {
-        checkUsername(request.getUsername());
+        checkUserByUsername(request.getUsername(), userAccountRepository);
+
         try {
             UserRole userRole = UserRole.findByDescription(request.getRole());
             if (userRole == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, Constant.ERROR_ROLE_NOT_FOUND);
@@ -48,7 +50,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserAccount create(UserAccount userAccount) {
-        checkUsername(userAccount.getUsername());
+        checkUserByUsername(userAccount.getUsername(), userAccountRepository);
         userAccount.setPassword(passwordEncoder.encode(userAccount.getPassword()));
         return userAccountRepository.saveAndFlush(userAccount);
     }
@@ -63,11 +65,6 @@ public class UserServiceImpl implements UserService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserAccount userAccount = (UserAccount) authentication.getPrincipal();
         return toUserResponse(userAccount);
-    }
-
-    private void checkUsername(String username) {
-        Optional<UserAccount> optionalUserAccount = userAccountRepository.findByUsername(username);
-        if (optionalUserAccount.isPresent()) throw new ResponseStatusException(HttpStatus.CONFLICT, Constant.ERROR_USERNAME_DUPLICATE);
     }
 
     @Override

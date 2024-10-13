@@ -3,15 +3,15 @@ package org.enigma.tokonyadia_api.service.impl;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.enigma.tokonyadia_api.dto.request.SearchCommonRequest;
-import org.enigma.tokonyadia_api.dto.request.TransactionRequest;
-import org.enigma.tokonyadia_api.dto.response.TransactionResponse;
+import org.enigma.tokonyadia_api.dto.request.OrderRequest;
+import org.enigma.tokonyadia_api.dto.response.OrderResponse;
 import org.enigma.tokonyadia_api.entity.Customer;
-import org.enigma.tokonyadia_api.entity.Transaction;
-import org.enigma.tokonyadia_api.entity.TransactionDetail;
-import org.enigma.tokonyadia_api.repository.TransactionRepository;
+import org.enigma.tokonyadia_api.entity.Order;
+import org.enigma.tokonyadia_api.entity.OrderDetail;
+import org.enigma.tokonyadia_api.repository.OrderRepository;
 import org.enigma.tokonyadia_api.service.CustomerService;
-import org.enigma.tokonyadia_api.service.TransactionDetailService;
-import org.enigma.tokonyadia_api.service.TransactionService;
+import org.enigma.tokonyadia_api.service.OrderDetailService;
+import org.enigma.tokonyadia_api.service.OrderService;
 import org.enigma.tokonyadia_api.specification.FilterSpecificationBuilder;
 import org.enigma.tokonyadia_api.utils.MapperUtil;
 import org.enigma.tokonyadia_api.utils.SortUtil;
@@ -32,53 +32,53 @@ import static org.enigma.tokonyadia_api.utils.MapperUtil.*;
 
 @AllArgsConstructor
 @Service
-public class TransactionServiceImpl implements TransactionService {
+public class OrderServiceImpl implements OrderService {
     private final CustomerService customerService;
-    private final TransactionDetailService transactionDetailService;
-    private final TransactionRepository transactionRepository;
+    private final OrderDetailService orderDetailService;
+    private final OrderRepository orderRepository;
 
     @Transactional(rollbackOn = Exception.class)
     @Override
-    public TransactionResponse create(TransactionRequest request) {
+    public OrderResponse create(OrderRequest request) {
         // get customer
         Customer customer = customerService.getOneById(request.getCustomerId());
 
         // create transaction
-        Transaction newTransaction = Transaction.builder()
+        Order newOrder = Order.builder()
                 .customer(customer)
                 .build();
-        transactionRepository.saveAndFlush(newTransaction);
+        orderRepository.saveAndFlush(newOrder);
 
         // create transaction detail
-        List<TransactionDetail> transactionDetailList = transactionDetailService.create(newTransaction, request.getTransactionsDetails());
+        List<OrderDetail> orderDetailList = orderDetailService.create(newOrder, request.getTransactionsDetails());
 
         // Response
-        newTransaction.setTransactionDetails(transactionDetailList);
-        return toTransactionResponse(newTransaction);
+        newOrder.setOrderDetails(orderDetailList);
+        return toTransactionResponse(newOrder);
     }
 
     @Override
-    public TransactionResponse getById(String id) {
-        Optional<Transaction> byId = transactionRepository.findById(id);
+    public OrderResponse getById(String id) {
+        Optional<Order> byId = orderRepository.findById(id);
         if (byId.isPresent()) {
-            Transaction transaction = byId.get();
-            List<TransactionDetail> transactionResponseList = new ArrayList<>(transaction.getTransactionDetails());
-            transaction.setTransactionDetails(transactionResponseList);
-            return toTransactionResponse(transaction);
+            Order order = byId.get();
+            List<OrderDetail> transactionResponseList = new ArrayList<>(order.getOrderDetails());
+            order.setOrderDetails(transactionResponseList);
+            return toTransactionResponse(order);
         }
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found");
     }
 
     @Override
-    public Page<TransactionResponse> getAll(SearchCommonRequest request) {
+    public Page<OrderResponse> getAll(SearchCommonRequest request) {
         Sort sortBy = SortUtil.parseSort(request.getSortBy());
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sortBy);
-        Specification<Transaction> specification = new FilterSpecificationBuilder<Transaction>()
+        Specification<Order> specification = new FilterSpecificationBuilder<Order>()
                 .withLike("name", request.getQuery())
                 .withEqual("siup", request.getQuery())
                 .withEqual("phoneNumber", request.getQuery())
                 .build();
-        Page<Transaction> resultPage = transactionRepository.findAll(specification, pageable);
+        Page<Order> resultPage = orderRepository.findAll(specification, pageable);
 
         return resultPage.map(MapperUtil::toTransactionResponse);
     }

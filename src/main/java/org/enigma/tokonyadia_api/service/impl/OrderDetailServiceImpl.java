@@ -2,13 +2,13 @@ package org.enigma.tokonyadia_api.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.enigma.tokonyadia_api.dto.request.ProductRequest;
-import org.enigma.tokonyadia_api.dto.request.TransactionDetailRequest;
+import org.enigma.tokonyadia_api.dto.request.OrderDetailRequest;
 import org.enigma.tokonyadia_api.entity.Product;
-import org.enigma.tokonyadia_api.entity.Transaction;
-import org.enigma.tokonyadia_api.entity.TransactionDetail;
-import org.enigma.tokonyadia_api.repository.TransactionDetailRepository;
+import org.enigma.tokonyadia_api.entity.Order;
+import org.enigma.tokonyadia_api.entity.OrderDetail;
+import org.enigma.tokonyadia_api.repository.OrderDetailRepository;
 import org.enigma.tokonyadia_api.service.ProductService;
-import org.enigma.tokonyadia_api.service.TransactionDetailService;
+import org.enigma.tokonyadia_api.service.OrderDetailService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -18,15 +18,15 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class TransactionDetailServiceImpl implements TransactionDetailService {
+public class OrderDetailServiceImpl implements OrderDetailService {
     private final ProductService productService;
-    private final TransactionDetailRepository transactionDetailRepository;
+    private final OrderDetailRepository orderDetailRepository;
 
     @Override
-    public List<TransactionDetail> create(Transaction transaction, List<TransactionDetailRequest> request) {
-        List<TransactionDetail> transactionDetailsList = new ArrayList<>();
+    public List<OrderDetail> create(Order order, List<OrderDetailRequest> request) {
+        List<OrderDetail> orderDetailsList = new ArrayList<>();
 
-        for (TransactionDetailRequest transactionsDetail : request) {
+        for (OrderDetailRequest transactionsDetail : request) {
             // find product untuk mengecek stock product
             Product product = productService.getOneById(transactionsDetail.getProductId());
             if (product.getStock() < transactionsDetail.getQuantity()) {
@@ -44,25 +44,25 @@ public class TransactionDetailServiceImpl implements TransactionDetailService {
                             .build()
             );
 
-            TransactionDetail transactionDetail = TransactionDetail.builder()
-                    .transaction(transaction)
+            OrderDetail orderDetail = OrderDetail.builder()
+                    .order(order)
                     .product(product)
                     .quantity(transactionsDetail.getQuantity())
                     .price(product.getPrice())
                     .build();
-            transactionDetailsList.add(transactionDetail);
+            orderDetailsList.add(orderDetail);
         }
-        transactionDetailRepository.saveAllAndFlush(transactionDetailsList);
-        return transactionDetailsList;
+        orderDetailRepository.saveAllAndFlush(orderDetailsList);
+        return orderDetailsList;
     }
 
     @Override
-    public TransactionDetail getById(String id) {
+    public OrderDetail getById(String id) {
         return null;
     }
 
     @Override
-    public List<TransactionDetail> getAll() {
+    public List<OrderDetail> getAll() {
         return List.of();
     }
 }

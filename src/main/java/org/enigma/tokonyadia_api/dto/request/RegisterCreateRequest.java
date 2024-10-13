@@ -7,7 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CustomerCreateRequest {
+public class RegisterCreateRequest {
     private String username;
     private String password;
     private String name;

@@ -6,8 +6,13 @@ public class Constant {
     public static final String CUSTOMER_TABLE = "m_customer";
     public static final String STORE_TABLE = "m_store";
     public static final String PRODUCT_TABLE = "m_product";
-    public static final String TRANSACTION_TABLE = "t_transaction";
-    public static final String TRANSACTION_DETAIL_TABLE = "t_transaction_detail";
+    public static final String PRODUCT_CATEGORY_TABLE = "m_product_category";
+    public static final String PRODUCT_PROMO_TABLE = "t_product_promo";
+    public static final String PRODUCT_RATING_TABLE = "t_product_rating";
+    public static final String SHIPMENT_TABLE = "t_shipment";
+    public static final String PAYMENT_TABLE = "t_payment";
+    public static final String ORDER_TABLE = "t_order";
+    public static final String ORDER_DETAIL_TABLE = "t_order_detail";
 
     // API
     public static final String USER_API = "/api/users";
@@ -15,7 +20,7 @@ public class Constant {
     public static final String CUSTOMER_API = "/api/customers";
     public static final String PRODUCT_API = "/api/products";
     public static final String STORE_API = "/api/stores";
-    public static final String TRANSACTION_API = "/api/transactions";
+    public static final String ORDER_API = "/api/order";
 //    public static final String TRANSACTION_DETAIL_API = "/api/transaction_details";
 
     // Message
@@ -42,9 +47,9 @@ public class Constant {
     public static final String SUCCESS_UPDATE_PRODUCT = "Successfully update product";
     public static final String SUCCESS_DELETE_PRODUCT = "Successfully delete product";
     public static final String SUCCESS_GET_ALL_PRODUCT = "Successfully get products";
-    // transaction
-    public static final String SUCCESS_CREATED_TRANSACTION = "Successfully created transaction";
-    public static final String SUCCESS_GET_TRANSACTION = "Successfully get transaction";
+    // order
+    public static final String SUCCESS_CREATED_ORDER = "Successfully created order";
+    public static final String SUCCESS_GET_ORDER = "Successfully get orders";
 
     // Error
     // user

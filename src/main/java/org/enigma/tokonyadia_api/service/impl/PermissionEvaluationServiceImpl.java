@@ -20,6 +20,6 @@ public class PermissionEvaluationServiceImpl implements PermissionEvaluationServ
         Customer customer = customerService.getOneById(customerId);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserAccount userAccount = (UserAccount) authentication.getPrincipal();
-        return !userAccount.getRole().equals(UserRole.ROLE_CUSTOMER) || userAccount.getId().equals(customer.getUserAccount().getId());
+        return !userAccount.getRole().equals(UserRole.ROLE_CUSTOMER) && !userAccount.getRole().equals(UserRole.ROLE_ADMIN) || userAccount.getId().equals(customer.getUserAccount().getId());
     }
 }

@@ -11,11 +11,11 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @ToString
-public class TransactionResponse {
+public class OrderResponse {
     private String id;
     private String customerName;
     private String customerPhoneNumber;
     private String storeName;
     private LocalDateTime transactionDate;
-    private List<TransactionDetailResponse> transactionsDetails;
+    private List<OrderDetailResponse> transactionsDetails;
 }

@@ -10,7 +10,7 @@ import lombok.*;
 // U, V -> Pembuatan generic type untuk 2nd
 // E -> Element dari suatu collection
 // R -> Return type
-public class CommonWithPaggingResponse<T> {
+public class CommonWithPagingResponse<T> {
     private Integer status;
     private String message;
     private T data;
