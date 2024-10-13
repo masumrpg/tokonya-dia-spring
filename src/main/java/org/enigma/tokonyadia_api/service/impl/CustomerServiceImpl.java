@@ -73,6 +73,7 @@ public class CustomerServiceImpl implements CustomerService {
         return toCustomerResponse(getOneById(id));
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public CustomerResponse update(String id, CustomerRequest customerRequest) {
         checkCustomerByPhone(customerRequest.getPhoneNumber());
