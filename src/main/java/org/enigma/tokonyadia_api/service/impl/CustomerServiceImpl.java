@@ -44,10 +44,14 @@ public class CustomerServiceImpl implements CustomerService {
         checkCustomerByEmail(request.getEmail(), customerRepository);
         checkCustomerByPhone(request.getPhoneNumber(), customerRepository);
 
+        if (request.getRole().equals(UserRole.ROLE_ADMIN.getDescription())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bad request");
+        }
+
         UserAccount userAccount = UserAccount.builder()
                 .username(request.getUsername())
                 .password(request.getPassword())
-                .role(UserRole.ROLE_CUSTOMER)
+                .role(UserRole.findByDescription(request.getRole()))
                 .build();
         userAccountService.create(userAccount);
         Customer customer = Customer.builder()

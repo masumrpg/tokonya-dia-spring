@@ -83,4 +83,12 @@ public class MapperUtil {
                 .role(userAccount.getRole().getDescription())
                 .build();
     }
+
+    public static ProductCategoryResponse toProductCategoryResponse(ProductCategory productCategory) {
+        return ProductCategoryResponse.builder()
+                .id(productCategory.getId())
+                .name(productCategory.getName())
+                .description(productCategory.getDescription())
+                .build();
+    }
 }

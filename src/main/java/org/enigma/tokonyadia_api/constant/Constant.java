@@ -21,6 +21,7 @@ public class Constant {
     public static final String PRODUCT_API = "/api/products";
     public static final String STORE_API = "/api/stores";
     public static final String ORDER_API = "/api/order";
+    public static final String PRODUCT_CATEGORY_API = "/api/product/categories";
 //    public static final String TRANSACTION_DETAIL_API = "/api/transaction_details";
 
     // Message
@@ -47,6 +48,8 @@ public class Constant {
     public static final String SUCCESS_UPDATE_PRODUCT = "Successfully update product";
     public static final String SUCCESS_DELETE_PRODUCT = "Successfully delete product";
     public static final String SUCCESS_GET_ALL_PRODUCT = "Successfully get products";
+    // product category
+    public static final String SUCCESS_GET_ALL_PRODUCT_CATEGORY = "Successfully retrieved products category";
     // order
     public static final String SUCCESS_CREATED_ORDER = "Successfully created order";
     public static final String SUCCESS_GET_ORDER = "Successfully get orders";
@@ -55,6 +58,7 @@ public class Constant {
     // user
     public static final String ERROR_USERNAME_DUPLICATE = "Username already exists";
     public static final String ERROR_ROLE_NOT_FOUND = "Role not found";
+    public static final String PRODUCT_CATEGORY_NOT_FOUND = "Product category not found";
 //    public static final String INVALID_CREDENTIALS = "Invalid credentials";
     public static final String ERROR_USERNAME_NOT_FOUND = "User not found";
     // jwt

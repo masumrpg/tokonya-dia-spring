@@ -1,5 +1,6 @@
 package org.enigma.tokonyadia_api.service.impl;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.enigma.tokonyadia_api.constant.Constant;
 import org.enigma.tokonyadia_api.constant.UserRole;
@@ -8,6 +9,7 @@ import org.enigma.tokonyadia_api.dto.response.UserResponse;
 import org.enigma.tokonyadia_api.entity.UserAccount;
 import org.enigma.tokonyadia_api.repository.UserAccountRepository;
 import org.enigma.tokonyadia_api.service.UserAccountService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -27,6 +29,30 @@ import static org.enigma.tokonyadia_api.utils.Verify.checkUserByUsername;
 public class UserAccountServiceImpl implements UserAccountService {
     private final UserAccountRepository userAccountRepository;
     private final PasswordEncoder passwordEncoder;
+
+    // =================== INIT ADMIN ACCOUNT ===========================
+
+    @Value("${warung.makan.bahari.user-admin}")
+    private String USERNAME_ADMIN;
+
+    @Value("${warung.makan.bahari.user-password}")
+    private String PASSWORD_ADMIN;
+
+
+    @PostConstruct
+    public void initUser() {
+        boolean exist = userAccountRepository.existsByUsername(USERNAME_ADMIN);
+        if (exist) return;
+        UserAccount userAccount = UserAccount.builder()
+                .username(USERNAME_ADMIN)
+                .password(passwordEncoder.encode(PASSWORD_ADMIN))
+                .role(UserRole.ROLE_ADMIN)
+                .build();
+        userAccountRepository.saveAndFlush(userAccount);
+    }
+
+    // ===================================================================
+
 
     @Transactional(rollbackFor = Exception.class)
     @Override

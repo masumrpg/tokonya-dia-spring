@@ -32,7 +32,7 @@ public class CustomerController {
         return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_GET_CUSTOMER, customerResponse);
     }
 
-    @PreAuthorize("hasRole('SUPER_ADMIN') or ((hasRole('ADMIN') or hasRole('CUSTOMER')) and @permissionEvaluationServiceImpl.hasAccessToCustomer(#customerId, authentication.principal.id))")
+    @PreAuthorize("hasRole('ADMIN') or ((hasRole('SELLER') or hasRole('CUSTOMER')) and @permissionEvaluationServiceImpl.hasAccessToCustomer(#customerId, authentication.principal.id))")
     @PutMapping("/{customerId}")
     public ResponseEntity<?> updateCustomer(@PathVariable String customerId,@RequestBody CustomerRequest request) {
         CustomerResponse customerResponse = customerService.update(customerId, request);
