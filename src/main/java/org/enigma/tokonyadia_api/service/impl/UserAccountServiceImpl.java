@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import static org.enigma.tokonyadia_api.utils.MapperUtil.toUserResponse;
-import static org.enigma.tokonyadia_api.utils.Verify.checkUserByUsername;
+import static org.enigma.tokonyadia_api.utils.Verify.userByUsername;
 
 @Service
 @RequiredArgsConstructor
@@ -57,7 +57,7 @@ public class UserAccountServiceImpl implements UserAccountService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public UserResponse create(UserRequest request) {
-        checkUserByUsername(request.getUsername(), userAccountRepository);
+        userByUsername(request.getUsername(), userAccountRepository);
 
         try {
             UserRole userRole = UserRole.findByDescription(request.getRole());
@@ -76,7 +76,7 @@ public class UserAccountServiceImpl implements UserAccountService {
 
     @Override
     public UserAccount create(UserAccount userAccount) {
-        checkUserByUsername(userAccount.getUsername(), userAccountRepository);
+        userByUsername(userAccount.getUsername(), userAccountRepository);
         userAccount.setPassword(passwordEncoder.encode(userAccount.getPassword()));
         return userAccountRepository.saveAndFlush(userAccount);
     }

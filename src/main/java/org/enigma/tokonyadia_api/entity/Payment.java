@@ -3,7 +3,6 @@ package org.enigma.tokonyadia_api.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.enigma.tokonyadia_api.constant.Constant;
-import org.enigma.tokonyadia_api.constant.PaymentStatus;
 
 @Entity
 @Setter
@@ -17,10 +16,12 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @Column(name = "method")
-    private String method;
+    @Column(name = "name")
+    private String name;
 
-    @Column(name = "status")
-    private PaymentStatus status;
+    @Column(name = "midtrans_code")
+    private String midtransCode;
 
+    @Column(name = "is_active")
+    private Boolean isActive;
 }

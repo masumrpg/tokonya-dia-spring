@@ -37,8 +37,8 @@ public class Store {
     private String address;
 
     @OneToOne
-    @JoinColumn(name = "customer_id")
-    private Customer customer;
+    @JoinColumn(name = "person_id")
+    private Person person;
 
     // Auditing fields
     @CreatedDate

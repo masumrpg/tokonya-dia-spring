@@ -26,10 +26,10 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     public List<OrderDetail> create(Order order, List<OrderDetailRequest> request) {
         List<OrderDetail> orderDetailsList = new ArrayList<>();
 
-        for (OrderDetailRequest transactionsDetail : request) {
+        for (OrderDetailRequest orderValue : request) {
             // find product untuk mengecek stock product
-            Product product = productService.getOneById(transactionsDetail.getProductId());
-            if (product.getStock() < transactionsDetail.getQuantity()) {
+            Product product = productService.getOneById(orderValue.getProductId());
+            if (product.getStock() < orderValue.getQuantity()) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid quantity");
             }
 
@@ -39,7 +39,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
                             .name(product.getName())
                             .description(product.getDescription())
                             .price(product.getPrice())
-                            .stock(product.getStock() - transactionsDetail.getQuantity())
+                            .stock(product.getStock() - orderValue.getQuantity())
                             .storeId(product.getStore().getId())
                             .build()
             );
@@ -47,7 +47,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
             OrderDetail orderDetail = OrderDetail.builder()
                     .order(order)
                     .product(product)
-                    .quantity(transactionsDetail.getQuantity())
+                    .quantity(orderValue.getQuantity())
                     .price(product.getPrice())
                     .build();
             orderDetailsList.add(orderDetail);

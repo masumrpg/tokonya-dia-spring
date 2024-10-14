@@ -41,7 +41,7 @@ public class UserAccount implements UserDetails {
     private UserRole role;
 
     @OneToOne(mappedBy = "userAccount", orphanRemoval = true)
-    private Customer customer;
+    private Person person;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

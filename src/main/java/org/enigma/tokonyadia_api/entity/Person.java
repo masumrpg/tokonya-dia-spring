@@ -18,10 +18,10 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = Constant.CUSTOMER_TABLE)
+@Table(name = Constant.PERSON_TABLE)
 @Builder
 @EntityListeners(AuditingEntityListener.class) // Mengaktifkan listener auditing
-public class Customer {
+public class Person {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
@@ -42,10 +42,10 @@ public class Customer {
     @JoinColumn(name = "user_account_id", nullable = false)
     private UserAccount userAccount;
 
-    @OneToOne(mappedBy = "customer", orphanRemoval = true)
+    @OneToOne(mappedBy = "person", orphanRemoval = true)
     private Store stores;
 
-    @OneToMany(mappedBy = "customer", orphanRemoval = true)
+    @OneToMany(mappedBy = "person", orphanRemoval = true)
     private List<ProductRating> productRatings;
 
     // Auditing fields

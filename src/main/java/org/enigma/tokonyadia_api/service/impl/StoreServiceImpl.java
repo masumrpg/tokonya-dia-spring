@@ -10,6 +10,7 @@ import org.enigma.tokonyadia_api.service.StoreService;
 import org.enigma.tokonyadia_api.specification.FilterSpecificationBuilder;
 import org.enigma.tokonyadia_api.utils.MapperUtil;
 import org.enigma.tokonyadia_api.utils.SortUtil;
+import org.enigma.tokonyadia_api.utils.Verify;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -31,8 +32,9 @@ public class StoreServiceImpl implements StoreService {
 
     @Override
     public StoreResponse create(StoreRequest storeRequest) {
-        verifyBySiup(storeRequest.getSiup());
-        verifyByPhoneNumber(storeRequest.getPhoneNumber());
+        Verify.storeBySiup(storeRequest.getSiup(), storeRepository);
+        Verify.storeByPhoneNumber(storeRequest.getPhoneNumber(), storeRepository);
+
         Store store = Store.builder()
                 .name(storeRequest.getName())
                 .phoneNumber(storeRequest.getPhoneNumber())
@@ -50,8 +52,9 @@ public class StoreServiceImpl implements StoreService {
 
     @Override
     public StoreResponse update(String id, StoreRequest storeRequest) {
-        verifyBySiup(storeRequest.getSiup());
-        verifyByPhoneNumber(storeRequest.getPhoneNumber());
+        Verify.storeBySiup(storeRequest.getSiup(), storeRepository);
+        Verify.storeByPhoneNumber(storeRequest.getPhoneNumber(), storeRepository);
+
         Store store = getOneById(id);
         store.setName(storeRequest.getName());
         store.setPhoneNumber(storeRequest.getPhoneNumber());
@@ -88,19 +91,5 @@ public class StoreServiceImpl implements StoreService {
         Page<Store> resultPage = storeRepository.findAll(specification, pageable);
 
         return resultPage.map(MapperUtil::toStoreResponse);
-    }
-
-    private void verifyBySiup(String siup) {
-        Optional<Store> bySiup = storeRepository.findByPhoneNumber(siup);
-        if (bySiup.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Siup with " + siup + " already exist!");
-        }
-    }
-
-    private void verifyByPhoneNumber(String email) {
-        Optional<Store> byPhone = storeRepository.findByPhoneNumber(email);
-        if (byPhone.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Phone whith " + email + " already exist!");
-        }
     }
 }

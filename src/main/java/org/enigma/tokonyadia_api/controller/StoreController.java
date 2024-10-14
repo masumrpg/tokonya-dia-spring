@@ -39,7 +39,7 @@ public class StoreController {
     @DeleteMapping("/{storeId}")
     public ResponseEntity<?> deleteProduct(@PathVariable String storeId) {
         storeService.delete(storeId);
-        return ResponseUtil.buildCommonResponse(HttpStatus.NO_CONTENT, Constant.SUCCESS_DELETE_STORE, null);
+        return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_DELETE_STORE, null);
     }
 
     @GetMapping
@@ -55,7 +55,7 @@ public class StoreController {
                 .sortBy(sort)
                 .query(query)
                 .build();
-        Page<StoreResponse> customerResponsePage = storeService.getAll(searchCommonRequest);
-        return ResponseUtil.buildResponsePage(HttpStatus.OK, Constant.SUCCESS_GET_All_STORE, customerResponsePage);
+        Page<StoreResponse> storeResponsePage = storeService.getAll(searchCommonRequest);
+        return ResponseUtil.buildResponsePage(HttpStatus.OK, Constant.SUCCESS_GET_All_STORE, storeResponsePage);
     }
 }

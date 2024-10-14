@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.enigma.tokonyadia_api.constant.Constant;
 
+import java.util.List;
+
 @Entity
 @Setter
 @Getter
@@ -21,4 +23,7 @@ public class ProductCategory {
 
     @Column(name = "description", nullable = false)
     private String description;
+
+    @OneToMany(mappedBy = "category")
+    private List<Product> products;
 }

@@ -23,8 +23,8 @@ public class ProductRating {
     private Product product;
 
     @ManyToOne
-    @JoinColumn(name = "customer_id", nullable = false)
-    private Customer customer;
+    @JoinColumn(name = "person_id", nullable = false)
+    private Person person;
 
     @Column(name = "rating", nullable = false)
     private Integer rating;

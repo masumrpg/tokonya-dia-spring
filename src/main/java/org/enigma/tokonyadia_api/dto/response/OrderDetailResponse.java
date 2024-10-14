@@ -11,6 +11,7 @@ import lombok.*;
 public class OrderDetailResponse {
     private String productId;
     private String productName;
+    private String storeName;
     private Long price;
     private Integer quantity;
 //    private String discount; // for future feature

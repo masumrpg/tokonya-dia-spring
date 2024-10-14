@@ -13,9 +13,8 @@ import java.util.List;
 @ToString
 public class OrderResponse {
     private String id;
-    private String customerName;
-    private String customerPhoneNumber;
-    private String storeName;
-    private LocalDateTime transactionDate;
-    private List<OrderDetailResponse> transactionsDetails;
+    private String personName;
+    private String personPhoneNumber;
+    private LocalDateTime orderDate;
+    private List<OrderDetailResponse> orderDetails;
 }

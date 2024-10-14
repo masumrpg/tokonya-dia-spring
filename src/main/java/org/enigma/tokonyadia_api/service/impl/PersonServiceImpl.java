@@ -1,20 +1,22 @@
 package org.enigma.tokonyadia_api.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.enigma.tokonyadia_api.constant.Constant;
 import org.enigma.tokonyadia_api.constant.UserRole;
-import org.enigma.tokonyadia_api.dto.request.CustomerRequest;
+import org.enigma.tokonyadia_api.dto.request.PersonRequest;
 import org.enigma.tokonyadia_api.dto.request.RegisterCreateRequest;
 import org.enigma.tokonyadia_api.dto.request.SearchCommonRequest;
 import org.enigma.tokonyadia_api.dto.request.UserRequest;
-import org.enigma.tokonyadia_api.dto.response.CustomerResponse;
-import org.enigma.tokonyadia_api.entity.Customer;
+import org.enigma.tokonyadia_api.dto.response.PersonResponse;
+import org.enigma.tokonyadia_api.entity.Person;
 import org.enigma.tokonyadia_api.entity.UserAccount;
-import org.enigma.tokonyadia_api.repository.CustomerRepository;
-import org.enigma.tokonyadia_api.service.CustomerService;
+import org.enigma.tokonyadia_api.repository.PersonRepository;
+import org.enigma.tokonyadia_api.service.PersonService;
 import org.enigma.tokonyadia_api.service.UserAccountService;
 import org.enigma.tokonyadia_api.specification.FilterSpecificationBuilder;
 import org.enigma.tokonyadia_api.utils.MapperUtil;
 import org.enigma.tokonyadia_api.utils.SortUtil;
+import org.enigma.tokonyadia_api.utils.Verify;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,21 +30,18 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Optional;
 
 import static org.enigma.tokonyadia_api.utils.MapperUtil.*;
-import static org.enigma.tokonyadia_api.utils.Verify.checkCustomerByEmail;
-import static org.enigma.tokonyadia_api.utils.Verify.checkCustomerByPhone;
 
 @Service
 @RequiredArgsConstructor
-public class CustomerServiceImpl implements CustomerService {
-    private final CustomerRepository customerRepository;
+public class PersonServiceImpl implements PersonService {
+    private final PersonRepository personRepository;
     private final UserAccountService userAccountService;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public CustomerResponse create(RegisterCreateRequest request) {
-        // verify
-        checkCustomerByEmail(request.getEmail(), customerRepository);
-        checkCustomerByPhone(request.getPhoneNumber(), customerRepository);
+    public PersonResponse create(RegisterCreateRequest request) {
+        Verify.personByEmail(request.getEmail(), personRepository);
+        Verify.personByPhone(request.getPhoneNumber(), personRepository);
 
         if (request.getRole().equals(UserRole.ROLE_ADMIN.getDescription())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bad request");
@@ -54,22 +53,21 @@ public class CustomerServiceImpl implements CustomerService {
                 .role(UserRole.findByDescription(request.getRole()))
                 .build();
         userAccountService.create(userAccount);
-        Customer customer = Customer.builder()
+        Person person = Person.builder()
                 .name(request.getName())
                 .email(request.getEmail())
                 .phoneNumber(request.getPhoneNumber())
                 .userAccount(userAccount)
                 .build();
-        customerRepository.saveAndFlush(customer);
-        return toCustomerResponse(customer);
+        personRepository.saveAndFlush(person);
+        return toPersonResponse(person);
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public CustomerResponse create(UserRequest request) {
-        // verify
-        checkCustomerByEmail(request.getEmail(), customerRepository);
-        checkCustomerByPhone(request.getPhoneNumber(), customerRepository);
+    public PersonResponse create(UserRequest request) {
+        Verify.personByEmail(request.getEmail(), personRepository);
+        Verify.personByPhone(request.getPhoneNumber(), personRepository);
 
         UserAccount userAccount = UserAccount.builder()
                 .username(request.getUsername())
@@ -77,71 +75,73 @@ public class CustomerServiceImpl implements CustomerService {
                 .role(UserRole.findByDescription(request.getRole()))
                 .build();
         userAccountService.create(userAccount);
-        Customer customer = Customer.builder()
+        Person person = Person.builder()
                 .name(request.getName())
                 .email(request.getEmail())
                 .phoneNumber(request.getPhoneNumber())
                 .userAccount(userAccount)
                 .build();
-        customerRepository.saveAndFlush(customer);
-        return toCustomerResponse(customer);
+        personRepository.saveAndFlush(person);
+        return toPersonResponse(person);
     }
 
     @Override
-    public Customer create(Customer customer) {
-        checkCustomerByEmail(customer.getEmail(), customerRepository);
-        checkCustomerByPhone(customer.getPhoneNumber(), customerRepository);
-        customerRepository.saveAndFlush(customer);
-        return customer;
+    public Person create(Person person) {
+        Verify.personByEmail(person.getEmail(), personRepository);
+        Verify.personByPhone(person.getPhoneNumber(), personRepository);
+
+        personRepository.saveAndFlush(person);
+        return person;
     }
 
     @Transactional(readOnly = true)
     @Override
-    public Customer getOneById(String id) {
-        Optional<Customer> byId = customerRepository.findById(id);
+    public Person getOneById(String id) {
+        Optional<Person> byId = personRepository.findById(id);
         if (byId.isPresent()) {
             return byId.get();
         }
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer not found");
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, Constant.ERROR_PERSON_NOT_FOUND);
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public CustomerResponse getById(String id) {
-        return toCustomerResponse(getOneById(id));
+    public PersonResponse getById(String id) {
+        return toPersonResponse(getOneById(id));
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public CustomerResponse update(String id, CustomerRequest customerRequest) {
-        checkCustomerByPhone(customerRequest.getPhoneNumber(), customerRepository);
-        checkCustomerByEmail(customerRequest.getEmail(), customerRepository);
-        Customer customer = getOneById(id);
-        customer.setName(customerRequest.getName());
-        customer.setPhoneNumber(customerRequest.getPhoneNumber());
-        customer.setEmail(customerRequest.getEmail());
-        customer.setAddress(customerRequest.getAddress());
-        customerRepository.save(customer);
-        return toCustomerResponse(customer);
+    public PersonResponse update(String id, PersonRequest personRequest) {
+        Verify.personByPhone(personRequest.getPhoneNumber(), personRepository);
+        Verify.personByEmail(personRequest.getEmail(), personRepository);
+
+        Person person = getOneById(id);
+        person.setName(personRequest.getName());
+        person.setPhoneNumber(personRequest.getPhoneNumber());
+        person.setEmail(personRequest.getEmail());
+        person.setAddress(personRequest.getAddress());
+        personRepository.save(person);
+        return toPersonResponse(person);
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void delete(String id) {
-        Customer customer = getOneById(id);
-        customerRepository.delete(customer);
+        Person person = getOneById(id);
+        personRepository.delete(person);
     }
 
     @Override
-    public Page<CustomerResponse> getAll(SearchCommonRequest request) {
+    public Page<PersonResponse> getAll(SearchCommonRequest request) {
         Sort sortBy = SortUtil.parseSort(request.getSortBy());
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sortBy);
-        Specification<Customer> specification = new FilterSpecificationBuilder<Customer>()
+        Specification<Person> specification = new FilterSpecificationBuilder<Person>()
                 .withLike("name", request.getQuery())
                 .withEqual("phoneNumber", request.getQuery())
                 .build();
-        Page<Customer> resultPage = customerRepository.findAll(specification, pageable);
+        Page<Person> resultPage = personRepository.findAll(specification, pageable);
 
-        return resultPage.map(MapperUtil::toCustomerResponse);
+        return resultPage.map(MapperUtil::toPersonResponse);
     }
 }

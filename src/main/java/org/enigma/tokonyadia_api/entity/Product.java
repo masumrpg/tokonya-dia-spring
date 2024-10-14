@@ -41,11 +41,15 @@ public class Product {
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
 
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private ProductCategory category;
+
     @OneToMany(mappedBy = "product", orphanRemoval = true)
     private List<ProductRating> productRating;
 
-    @OneToOne(mappedBy = "product", orphanRemoval = true)
-    private ProductPromo productPromo;
+    @OneToMany(mappedBy = "product", orphanRemoval = true)
+    private List<ProductPromo> productPromo;
 
     // Auditing fields
     @CreatedDate

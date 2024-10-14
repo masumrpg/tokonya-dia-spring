@@ -1,8 +1,8 @@
 package org.enigma.tokonyadia_api.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.enigma.tokonyadia_api.dto.response.CustomerResponse;
-import org.enigma.tokonyadia_api.service.CustomerService;
+import org.enigma.tokonyadia_api.dto.response.PersonResponse;
+import org.enigma.tokonyadia_api.service.PersonService;
 import org.enigma.tokonyadia_api.utils.ResponseUtil;
 import org.enigma.tokonyadia_api.constant.Constant;
 import org.enigma.tokonyadia_api.dto.request.UserRequest;
@@ -16,14 +16,14 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(path = Constant.USER_API)
 @RequiredArgsConstructor
-public class UserController {
+public class UserAccountController {
     private final UserAccountService userAccountService;
-    private final CustomerService customerService;
+    private final PersonService personService;
 
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     @PostMapping
     public ResponseEntity<?> createUser(@RequestBody UserRequest request) {
-        CustomerResponse userResponse = customerService.create(request);
+        PersonResponse userResponse = personService.create(request);
         return ResponseUtil.buildCommonResponse(HttpStatus.CREATED, Constant.SUCCESS_CREATE_USER, userResponse);
     }
 
