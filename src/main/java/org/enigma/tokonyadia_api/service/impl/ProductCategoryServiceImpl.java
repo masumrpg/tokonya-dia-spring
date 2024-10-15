@@ -9,8 +9,8 @@ import org.enigma.tokonyadia_api.entity.ProductCategory;
 import org.enigma.tokonyadia_api.repository.ProductCategoryRepository;
 import org.enigma.tokonyadia_api.service.ProductCategoryService;
 import org.enigma.tokonyadia_api.specification.FilterSpecificationBuilder;
-import org.enigma.tokonyadia_api.utils.MapperUtil;
-import org.enigma.tokonyadia_api.utils.SortUtil;
+import org.enigma.tokonyadia_api.util.MapperUtil;
+import org.enigma.tokonyadia_api.util.SortUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,7 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
-import static org.enigma.tokonyadia_api.utils.MapperUtil.toProductCategoryResponse;
+import static org.enigma.tokonyadia_api.util.MapperUtil.toProductCategoryResponse;
 
 @Service
 @RequiredArgsConstructor

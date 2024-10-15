@@ -41,7 +41,7 @@ public class Shipment {
     @Column(name = "estimate_date", nullable = false)
     private LocalDateTime estimateDate;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "order_id")
     private Order order;
 

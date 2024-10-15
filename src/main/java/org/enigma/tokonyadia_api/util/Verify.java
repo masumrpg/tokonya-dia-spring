@@ -1,4 +1,4 @@
-package org.enigma.tokonyadia_api.utils;
+package org.enigma.tokonyadia_api.util;
 
 import org.enigma.tokonyadia_api.constant.Constant;
 import org.enigma.tokonyadia_api.repository.PersonRepository;

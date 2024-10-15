@@ -10,6 +10,8 @@ import lombok.*;
 public class PersonResponse {
     private String id;
     private String name;
+    private String imageUrl;
+    private String gender;
     private String email;
     private String phoneNumber;
     private String address;

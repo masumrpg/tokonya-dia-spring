@@ -1,7 +1,7 @@
 package org.enigma.tokonyadia_api.service.impl;
 
-import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.enigma.tokonyadia_api.constant.Constant;
 import org.enigma.tokonyadia_api.constant.OrderStatus;
 import org.enigma.tokonyadia_api.dto.request.OrderDetailRequest;
@@ -19,8 +19,8 @@ import org.enigma.tokonyadia_api.service.OrderDetailService;
 import org.enigma.tokonyadia_api.service.OrderService;
 import org.enigma.tokonyadia_api.service.ProductService;
 import org.enigma.tokonyadia_api.specification.FilterSpecificationBuilder;
-import org.enigma.tokonyadia_api.utils.MapperUtil;
-import org.enigma.tokonyadia_api.utils.SortUtil;
+import org.enigma.tokonyadia_api.util.MapperUtil;
+import org.enigma.tokonyadia_api.util.SortUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,14 +28,16 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.enigma.tokonyadia_api.utils.MapperUtil.*;
+import static org.enigma.tokonyadia_api.util.MapperUtil.*;
 
+@Slf4j
 @AllArgsConstructor
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -44,19 +46,23 @@ public class OrderServiceImpl implements OrderService {
     private final OrderDetailService orderDetailService;
     private final ProductService productService;
 
-    @Transactional(rollbackOn = Exception.class)
+
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public OrderResponse create(OrderRequest request) {
         Person person = personService.getOneById(request.getPersonId());
 
         Optional<Order> optionalOrder = orderRepository.findByPerson(person);
         if (optionalOrder.isPresent()) {
-            if (optionalOrder.get().getStatus().equals(OrderStatus.DRAFT)) throw new ResponseStatusException(HttpStatus.CONFLICT, Constant.ERROR_ORDER_ALREADY_EXISTS);;
+            if (optionalOrder.get().getStatus().equals(OrderStatus.DRAFT))
+                throw new ResponseStatusException(HttpStatus.CONFLICT, Constant.ERROR_ORDER_ALREADY_EXISTS);
+            ;
         }
 
         Order newOrder = Order.builder()
                 .person(person)
                 .status(OrderStatus.DRAFT)
+                .orderDetails(new ArrayList<>())
                 .build();
         orderRepository.saveAndFlush(newOrder);
 
@@ -68,37 +74,51 @@ public class OrderServiceImpl implements OrderService {
         return MapperUtil.toOrderResponse(getOne(orderId));
     }
 
-    // FIXME masih error null get name
+    @Transactional(rollbackFor = Exception.class)
     @Override
-    public OrderResponse createDetailByOrderId(String orderId, OrderDetailRequest request) {
-        Product product = productService.getOneById(request.getProductId());
+    public List<OrderDetailResponse> addOrderDetailByOrderId(String orderId, OrderDetailRequest request) {
+        boolean itemFound = false;
+        List<OrderDetailResponse> orderDetailResponses = new ArrayList<>();
+        List<OrderDetail> orderDetailList = new ArrayList<>();
 
         Order order = getOne(orderId);
         if (order.getStatus() != OrderStatus.DRAFT) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Constant.ERROR_ADD_ITEMS_TO_NON_DRAFT);
         }
 
-        Optional<OrderDetail> existingOrderDetail = order.getOrderDetails().stream()
-                .filter(detail -> detail.getProduct().getId().equals(product.getId()))
-                .findFirst();
+        Product product = productService.getOneById(request.getProductId());
 
-        if (existingOrderDetail.isPresent()) {
-            OrderDetail orderDetail = existingOrderDetail.get();
-            orderDetail.setQuantity(orderDetail.getQuantity() + request.getQuantity());
-            orderDetail.setPrice(product.getPrice());
-        } else {
+        for (OrderDetail orderDetail : order.getOrderDetails()) {
+            if (orderDetail.getProduct().getId().equals(product.getId())) {
+                if (orderDetail.getQuantity() + 1 > product.getStock()) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product stock is not enough");
+                }
+                orderDetail.setOrder(order);
+                orderDetail.setQuantity(orderDetail.getQuantity() + 1);
+                orderDetail.setPrice(product.getPrice());
+                orderDetailResponses.add(toOrderDetailResponse(orderDetail));
+                itemFound = true;
+                break;
+            }
+        }
+
+        if (!itemFound) {
             OrderDetail newOrderDetail = OrderDetail.builder()
                     .product(product)
                     .order(order)
-                    .quantity(request.getQuantity())
+                    .quantity(1)
                     .price(product.getPrice())
                     .build();
-            order.getOrderDetails().add(newOrderDetail);
-        }
+            OrderDetail orderDetailAdded = orderDetailService.create(newOrderDetail);
+            orderDetailList.add(orderDetailAdded);
+            orderDetailResponses.add(toOrderDetailResponse(orderDetailAdded));
+            order.getOrderDetails().addAll(orderDetailList);
 
-        Order updatedOrder = orderRepository.save(order);
-        return toOrderResponse(updatedOrder);
+            orderRepository.saveAndFlush(order);
+        }
+        return orderDetailResponses;
     }
+
 
     @Override
     public Order getOne(String orderId) {
@@ -119,6 +139,7 @@ public class OrderServiceImpl implements OrderService {
         return orderDetailList.stream().map(MapperUtil::toOrderDetailResponse).toList();
     }
 
+    
     @Override
     public Page<OrderResponse> getAll(SearchCommonRequest request) {
         Sort sortBy = SortUtil.parseSort(request.getSortBy());

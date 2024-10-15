@@ -7,8 +7,10 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PersonRequest {
+public class UpdatePersonRequest {
     private String name;
+    private String imgUrl;
+    private String gender;
     private String email;
     private String phoneNumber;
     private String address;

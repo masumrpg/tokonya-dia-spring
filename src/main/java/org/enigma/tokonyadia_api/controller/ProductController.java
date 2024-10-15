@@ -4,9 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.enigma.tokonyadia_api.constant.Constant;
 import org.enigma.tokonyadia_api.dto.request.ProductRequest;
 import org.enigma.tokonyadia_api.dto.request.SearchWithMinMaxRequest;
+import org.enigma.tokonyadia_api.dto.request.UpdateProductRequest;
 import org.enigma.tokonyadia_api.dto.response.ProductResponse;
 import org.enigma.tokonyadia_api.service.ProductService;
-import org.enigma.tokonyadia_api.utils.ResponseUtil;
+import org.enigma.tokonyadia_api.util.ResponseUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +32,7 @@ public class ProductController {
     }
 
     @PutMapping("/{productId}")
-    public ResponseEntity<?> updateProduct(@PathVariable String productId,@RequestBody ProductRequest product) {
+    public ResponseEntity<?> updateProduct(@PathVariable String productId, @RequestBody UpdateProductRequest product) {
         ProductResponse productResponse = productServiceImpl.update(productId, product);
         return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_UPDATE_PRODUCT, productResponse);
     }

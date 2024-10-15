@@ -3,11 +3,11 @@ package org.enigma.tokonyadia_api.controller;
 import lombok.RequiredArgsConstructor;
 import org.enigma.tokonyadia_api.constant.Constant;
 import org.enigma.tokonyadia_api.dto.request.RegisterCreateRequest;
-import org.enigma.tokonyadia_api.dto.request.PersonRequest;
+import org.enigma.tokonyadia_api.dto.request.UpdatePersonRequest;
 import org.enigma.tokonyadia_api.dto.request.SearchCommonRequest;
 import org.enigma.tokonyadia_api.dto.response.PersonResponse;
 import org.enigma.tokonyadia_api.service.PersonService;
-import org.enigma.tokonyadia_api.utils.ResponseUtil;
+import org.enigma.tokonyadia_api.util.ResponseUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +34,7 @@ public class PersonController {
 
     @PreAuthorize("hasRole('ADMIN') or ((hasRole('SELLER') or hasRole('CUSTOMER')) and @permissionEvaluationServiceImpl.hasAccessToCustomerAndSeller(#personId, authentication.principal.id))")
     @PutMapping("/{personId}")
-    public ResponseEntity<?> updatePerson(@PathVariable String personId,@RequestBody PersonRequest request) {
+    public ResponseEntity<?> updatePerson(@PathVariable String personId, @RequestBody UpdatePersonRequest request) {
         PersonResponse personResponse = personService.update(personId, request);
         return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_UPDATE_PERSON, personResponse);
     }
@@ -42,7 +42,7 @@ public class PersonController {
     @DeleteMapping("/{personId}")
     public ResponseEntity<?> deletePerson(@PathVariable String personId) {
         personService.delete(personId);
-        return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_DELETE_PERSON,null);
+        return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_DELETE_PERSON, null);
     }
 
     @GetMapping

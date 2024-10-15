@@ -8,7 +8,7 @@ import org.enigma.tokonyadia_api.dto.request.OrderRequest;
 import org.enigma.tokonyadia_api.dto.response.OrderDetailResponse;
 import org.enigma.tokonyadia_api.dto.response.OrderResponse;
 import org.enigma.tokonyadia_api.service.OrderService;
-import org.enigma.tokonyadia_api.utils.ResponseUtil;
+import org.enigma.tokonyadia_api.util.ResponseUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,9 +35,9 @@ public class OrderController {
     }
 
     @PostMapping("/{orderId}/details")
-    public ResponseEntity<?> createOrderDetailsById(@PathVariable String orderId, @RequestBody OrderDetailRequest request) {
-        OrderResponse orderResponse = orderService.createDetailByOrderId(orderId, request);
-        return ResponseUtil.buildCommonResponse(HttpStatus.CREATED, Constant.SUCCESS_CREATE_ORDER_DETAIL, orderResponse);
+    public ResponseEntity<?> addOrderDetailsById(@PathVariable String orderId, @RequestBody OrderDetailRequest request) {
+        List<OrderDetailResponse> orderDetailResponseList = orderService.addOrderDetailByOrderId(orderId, request);
+        return ResponseUtil.buildCommonResponse(HttpStatus.CREATED, Constant.SUCCESS_CREATE_ORDER_DETAIL, orderDetailResponseList);
     }
 
     @GetMapping("/{orderId}/details")

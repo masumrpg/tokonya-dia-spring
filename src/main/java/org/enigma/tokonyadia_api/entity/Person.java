@@ -3,6 +3,7 @@ package org.enigma.tokonyadia_api.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.enigma.tokonyadia_api.constant.Constant;
+import org.enigma.tokonyadia_api.constant.Gender;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -12,7 +13,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 import java.util.List;
 
-// TODO change entity to person
 @Entity
 @Setter
 @Getter
@@ -20,7 +20,7 @@ import java.util.List;
 @NoArgsConstructor
 @Table(name = Constant.PERSON_TABLE)
 @Builder
-@EntityListeners(AuditingEntityListener.class) // Mengaktifkan listener auditing
+@EntityListeners(AuditingEntityListener.class)
 public class Person {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -29,7 +29,14 @@ public class Person {
     @Column(name = "name", nullable = false, length = 150)
     private String name;
 
-    @Column(name = "phone_number", unique = true, nullable = false,length = 15)
+    @Column(name = "img_url")
+    private String imgUrl;
+
+    @Column(name = "gender", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
+
+    @Column(name = "phone_number", unique = true, nullable = false, length = 15)
     private String phoneNumber;
 
     @Column(name = "email", unique = true, nullable = false, length = 100)

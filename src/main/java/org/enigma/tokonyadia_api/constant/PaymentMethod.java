@@ -1,5 +1,8 @@
 package org.enigma.tokonyadia_api.constant;
 
+import lombok.Getter;
+
+@Getter
 public enum PaymentMethod {
     BANK_TRANSFER("Bank Transfer"),
     CREDIT_CARD("Credit Card"),

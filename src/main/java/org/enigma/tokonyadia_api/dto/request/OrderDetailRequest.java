@@ -9,5 +9,4 @@ import lombok.*;
 @Builder
 public class OrderDetailRequest {
     private String productId;
-    private Integer quantity;
 }

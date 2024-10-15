@@ -1,4 +1,4 @@
-package org.enigma.tokonyadia_api.utils;
+package org.enigma.tokonyadia_api.util;
 
 import org.enigma.tokonyadia_api.dto.response.*;
 import org.enigma.tokonyadia_api.entity.*;
@@ -14,6 +14,8 @@ public class MapperUtil {
         return PersonResponse.builder()
                 .id(person.getId())
                 .name(person.getName())
+                .imageUrl(person.getImgUrl())
+                .gender(person.getGender().getDescription())
                 .address(person.getAddress())
                 .phoneNumber(person.getPhoneNumber())
                 .email(person.getEmail())
@@ -33,6 +35,8 @@ public class MapperUtil {
         return ProductResponse.builder()
                 .id(product.getId())
                 .name(product.getName())
+                .imageUrl(product.getImgUrl())
+                .category(product.getCategory().getName())
                 .description(product.getDescription())
                 .price(product.getPrice())
                 .stock(product.getStock())
@@ -80,7 +84,7 @@ public class MapperUtil {
                 .id(order.getId())
                 .personName(order.getPerson().getName())
                 .personPhoneNumber(order.getPerson().getPhoneNumber())
-                .orderDate(order.getOrderDate())
+                .orderDate(order.getOrderDate().toString())
                 .orderDetails(orderDetailResponses)
                 .build();
     }

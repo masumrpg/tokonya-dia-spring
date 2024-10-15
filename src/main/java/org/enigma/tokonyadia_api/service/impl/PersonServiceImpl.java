@@ -2,11 +2,11 @@ package org.enigma.tokonyadia_api.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.enigma.tokonyadia_api.constant.Constant;
+import org.enigma.tokonyadia_api.constant.Gender;
 import org.enigma.tokonyadia_api.constant.UserRole;
-import org.enigma.tokonyadia_api.dto.request.PersonRequest;
+import org.enigma.tokonyadia_api.dto.request.UpdatePersonRequest;
 import org.enigma.tokonyadia_api.dto.request.RegisterCreateRequest;
 import org.enigma.tokonyadia_api.dto.request.SearchCommonRequest;
-import org.enigma.tokonyadia_api.dto.request.UserRequest;
 import org.enigma.tokonyadia_api.dto.response.PersonResponse;
 import org.enigma.tokonyadia_api.entity.Person;
 import org.enigma.tokonyadia_api.entity.UserAccount;
@@ -14,9 +14,9 @@ import org.enigma.tokonyadia_api.repository.PersonRepository;
 import org.enigma.tokonyadia_api.service.PersonService;
 import org.enigma.tokonyadia_api.service.UserAccountService;
 import org.enigma.tokonyadia_api.specification.FilterSpecificationBuilder;
-import org.enigma.tokonyadia_api.utils.MapperUtil;
-import org.enigma.tokonyadia_api.utils.SortUtil;
-import org.enigma.tokonyadia_api.utils.Verify;
+import org.enigma.tokonyadia_api.util.MapperUtil;
+import org.enigma.tokonyadia_api.util.SortUtil;
+import org.enigma.tokonyadia_api.util.Verify;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,7 +29,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
-import static org.enigma.tokonyadia_api.utils.MapperUtil.*;
+import static org.enigma.tokonyadia_api.util.MapperUtil.*;
 
 @Service
 @RequiredArgsConstructor
@@ -55,6 +55,7 @@ public class PersonServiceImpl implements PersonService {
         userAccountService.create(userAccount);
         Person person = Person.builder()
                 .name(request.getName())
+                .gender(Gender.findByDescription(request.getGender()))
                 .email(request.getEmail())
                 .phoneNumber(request.getPhoneNumber())
                 .userAccount(userAccount)
@@ -64,27 +65,6 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    @Override
-    public PersonResponse create(UserRequest request) {
-        Verify.personByEmail(request.getEmail(), personRepository);
-        Verify.personByPhone(request.getPhoneNumber(), personRepository);
-
-        UserAccount userAccount = UserAccount.builder()
-                .username(request.getUsername())
-                .password(request.getPassword())
-                .role(UserRole.findByDescription(request.getRole()))
-                .build();
-        userAccountService.create(userAccount);
-        Person person = Person.builder()
-                .name(request.getName())
-                .email(request.getEmail())
-                .phoneNumber(request.getPhoneNumber())
-                .userAccount(userAccount)
-                .build();
-        personRepository.saveAndFlush(person);
-        return toPersonResponse(person);
-    }
-
     @Override
     public Person create(Person person) {
         Verify.personByEmail(person.getEmail(), personRepository);
@@ -112,15 +92,17 @@ public class PersonServiceImpl implements PersonService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public PersonResponse update(String id, PersonRequest personRequest) {
-        Verify.personByPhone(personRequest.getPhoneNumber(), personRepository);
-        Verify.personByEmail(personRequest.getEmail(), personRepository);
+    public PersonResponse update(String id, UpdatePersonRequest request) {
+        Verify.personByPhone(request.getPhoneNumber(), personRepository);
+        Verify.personByEmail(request.getEmail(), personRepository);
 
         Person person = getOneById(id);
-        person.setName(personRequest.getName());
-        person.setPhoneNumber(personRequest.getPhoneNumber());
-        person.setEmail(personRequest.getEmail());
-        person.setAddress(personRequest.getAddress());
+        person.setName(request.getName());
+        person.setImgUrl(request.getImgUrl());
+        person.setGender(Gender.findByDescription(request.getGender()));
+        person.setEmail(request.getEmail());
+        person.setPhoneNumber(request.getPhoneNumber());
+        person.setAddress(request.getAddress());
         personRepository.save(person);
         return toPersonResponse(person);
     }
@@ -132,6 +114,7 @@ public class PersonServiceImpl implements PersonService {
         personRepository.delete(person);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<PersonResponse> getAll(SearchCommonRequest request) {
         Sort sortBy = SortUtil.parseSort(request.getSortBy());

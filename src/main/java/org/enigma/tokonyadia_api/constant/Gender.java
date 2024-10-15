@@ -3,19 +3,18 @@ package org.enigma.tokonyadia_api.constant;
 import lombok.Getter;
 
 @Getter
-public enum UserRole {
-    ROLE_ADMIN("Admin"),
-    ROLE_SELLER("Seller"),
-    ROLE_CUSTOMER("Seller");
+public enum Gender {
+    MALE("Male"),
+    FEMALE("Female");
 
     private final String description;
 
-    UserRole(String description) {
+    Gender(String description) {
         this.description = description;
     }
 
-    public static UserRole findByDescription(String description) {
-        for (UserRole value : values()) {
+    public static Gender findByDescription(String description) {
+        for (Gender value : values()) {
             if (value.description.equalsIgnoreCase(description)) {
                 return value;
             }

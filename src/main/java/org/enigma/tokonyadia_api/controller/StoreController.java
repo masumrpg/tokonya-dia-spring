@@ -6,7 +6,7 @@ import org.enigma.tokonyadia_api.dto.request.SearchCommonRequest;
 import org.enigma.tokonyadia_api.dto.request.StoreRequest;
 import org.enigma.tokonyadia_api.dto.response.StoreResponse;
 import org.enigma.tokonyadia_api.service.StoreService;
-import org.enigma.tokonyadia_api.utils.ResponseUtil;
+import org.enigma.tokonyadia_api.util.ResponseUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

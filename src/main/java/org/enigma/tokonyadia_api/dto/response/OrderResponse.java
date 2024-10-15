@@ -2,7 +2,6 @@ package org.enigma.tokonyadia_api.dto.response;
 
 import lombok.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -15,6 +14,6 @@ public class OrderResponse {
     private String id;
     private String personName;
     private String personPhoneNumber;
-    private LocalDateTime orderDate;
+    private String orderDate;
     private List<OrderDetailResponse> orderDetails;
 }

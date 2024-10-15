@@ -3,16 +3,18 @@ package org.enigma.tokonyadia_api.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.enigma.tokonyadia_api.dto.request.ProductRequest;
 import org.enigma.tokonyadia_api.dto.request.SearchWithMinMaxRequest;
+import org.enigma.tokonyadia_api.dto.request.UpdateProductRequest;
 import org.enigma.tokonyadia_api.dto.response.ProductResponse;
-import org.enigma.tokonyadia_api.dto.response.StoreResponse;
 import org.enigma.tokonyadia_api.entity.Product;
+import org.enigma.tokonyadia_api.entity.ProductCategory;
 import org.enigma.tokonyadia_api.entity.Store;
 import org.enigma.tokonyadia_api.repository.ProductRepository;
+import org.enigma.tokonyadia_api.service.ProductCategoryService;
 import org.enigma.tokonyadia_api.service.ProductService;
 import org.enigma.tokonyadia_api.service.StoreService;
 import org.enigma.tokonyadia_api.specification.FilterSpecificationBuilder;
-import org.enigma.tokonyadia_api.utils.MapperUtil;
-import org.enigma.tokonyadia_api.utils.SortUtil;
+import org.enigma.tokonyadia_api.util.MapperUtil;
+import org.enigma.tokonyadia_api.util.SortUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,28 +26,25 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
-import static org.enigma.tokonyadia_api.utils.MapperUtil.toProductResponse;
+import static org.enigma.tokonyadia_api.util.MapperUtil.toProductResponse;
 
 @Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
+    private final ProductCategoryService productCategoryService;
     private final StoreService storeService;
 
     @Override
-    public ProductResponse create(ProductRequest productRequest) {
-        StoreResponse storeResponse = storeService.getById(productRequest.getStoreId());
-        Store store = Store.builder()
-                .id(storeResponse.getId())
-                .siup(storeResponse.getSiup())
-                .name(storeResponse.getName())
-                .address(storeResponse.getAddress())
-                .build();
+    public ProductResponse create(ProductRequest request) {
+        Store store = storeService.getOneById(request.getStoreId());
+        ProductCategory productCategory = productCategoryService.getOne(request.getCategoryId());
         Product product = Product.builder()
-                .name(productRequest.getName())
-                .description(productRequest.getDescription())
-                .price(productRequest.getPrice())
-                .stock(productRequest.getStock())
+                .name(request.getName())
+                .category(productCategory)
+                .description(request.getDescription())
+                .price(request.getPrice())
+                .stock(request.getStock())
                 .store(store)
                 .build();
         productRepository.saveAndFlush(product);
@@ -68,20 +67,17 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse update(String id, ProductRequest productRequest) {
-        StoreResponse storeResponse = storeService.getById(productRequest.getStoreId());
-        Store store = Store.builder()
-                .id(storeResponse.getId())
-                .siup(storeResponse.getSiup())
-                .name(storeResponse.getName())
-                .address(storeResponse.getAddress())
-                .build();
+    public ProductResponse update(String id, UpdateProductRequest request) {
+        Store store = storeService.getOneById(request.getStoreId());
+        ProductCategory productCategory = productCategoryService.getOne(request.getCategoryId());
 
         Product existingProduct = getOneById(id);
-        existingProduct.setName(productRequest.getName());
-        existingProduct.setDescription(productRequest.getDescription());
-        existingProduct.setPrice(productRequest.getPrice());
-        existingProduct.setStock(productRequest.getStock());
+        existingProduct.setName(request.getName());
+        existingProduct.setName(request.getImgUrl());
+        existingProduct.setCategory(productCategory);
+        existingProduct.setDescription(request.getDescription());
+        existingProduct.setPrice(request.getPrice());
+        existingProduct.setStock(request.getStock());
         existingProduct.setStore(store);
         return toProductResponse(existingProduct);
     }

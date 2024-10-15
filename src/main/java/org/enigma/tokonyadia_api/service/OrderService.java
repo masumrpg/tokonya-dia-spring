@@ -13,7 +13,7 @@ import java.util.List;
 public interface OrderService {
     OrderResponse create(OrderRequest request);
     OrderResponse getByOrderId(String orderId);
-    OrderResponse createDetailByOrderId(String orderId, OrderDetailRequest request);
+    List<OrderDetailResponse> addOrderDetailByOrderId(String orderId, OrderDetailRequest request);
     Order getOne(String id);
     List<OrderDetailResponse> getDetailByOrderId(String orderId);
     Page<OrderResponse> getAll(SearchCommonRequest request);

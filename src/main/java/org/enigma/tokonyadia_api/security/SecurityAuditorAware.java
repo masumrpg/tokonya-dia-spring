@@ -10,7 +10,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.util.Optional;
 
 @Slf4j
-public class SpringSecurityAuditorAware implements AuditorAware<String> {
+public class SecurityAuditorAware implements AuditorAware<String> {
     @NonNull
     @Override
     public Optional<String> getCurrentAuditor() {

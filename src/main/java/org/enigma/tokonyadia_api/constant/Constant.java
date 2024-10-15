@@ -13,6 +13,13 @@ public class Constant {
     public static final String PRODUCT_RATING_TABLE = "t_product_rating";
     public static final String ORDER_TABLE = "t_order";
     public static final String ORDER_DETAIL_TABLE = "t_order_detail";
+    public static final String INVOICE_TABLE = "t_invoice";
+    public static final String INVOICE_ITEM_TABLE = "t_invoice_item";
+
+    // auth
+    public static final String SUCCESS_LOGOUT = "Success logout";
+    public static final String REFRESH_TOKEN_COOKIE_NAME = "refreshToken";
+    public static final String REFRESH_TOKEN_REQUIRED = "Refresh token is required";
 
     // API
     public static final String USER_API = "/api/users";
@@ -21,8 +28,7 @@ public class Constant {
     public static final String PRODUCT_API = "/api/products";
     public static final String STORE_API = "/api/stores";
     public static final String ORDER_API = "/api/orders";
-    public static final String PRODUCT_CATEGORY_API = "/api/product/categories";
-//    public static final String TRANSACTION_DETAIL_API = "/api/transaction_details";
+    public static final String PRODUCT_CATEGORY_API = "/api/products/categories";
 
     // Message
     // user
@@ -63,12 +69,13 @@ public class Constant {
     public static final String ERROR_USERNAME_DUPLICATE = "Username already exists";
     public static final String ERROR_ROLE_NOT_FOUND = "Role not found";
     public static final String PRODUCT_CATEGORY_NOT_FOUND = "Product category not found";
-//    public static final String INVALID_CREDENTIALS = "Invalid credentials";
+    public static final String INVALID_CREDENTIALS = "Invalid credentials";
     public static final String ERROR_USERNAME_NOT_FOUND = "User not found";
     // jwt
     public static final String ERROR_CREATE_JWT = "Error creating JWT";
+    public static final String SUCCESS_GENERATED_ACCESS_TOKEN = "Success generated access token";
     // order
-    public static final String ERROR_ORDER_ALREADY_EXISTS = "Order already exists";
+    public static final String ERROR_ORDER_ALREADY_EXISTS = "Order draft already exists";
     public static final String ERROR_ORDER_NOT_FOUND = "Order not found";
     public static final String ERROR_ADD_ITEMS_TO_NON_DRAFT = "Error add items to non draft";
 }
