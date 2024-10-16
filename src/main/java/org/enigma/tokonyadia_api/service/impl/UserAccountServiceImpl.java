@@ -14,8 +14,8 @@ import org.enigma.tokonyadia_api.util.MapperUtil;
 import org.enigma.tokonyadia_api.util.ValidationUtil;
 import org.enigma.tokonyadia_api.util.Verify;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -62,7 +62,7 @@ public class UserAccountServiceImpl implements UserAccountService {
     public UserResponse create(UserRequest request) {
         validationUtil.validate(request);
         Verify.userByUsername(request.getUsername(), userAccountRepository);
-        
+
         UserAccount userAccount = UserAccount.builder()
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
@@ -105,8 +105,20 @@ public class UserAccountServiceImpl implements UserAccountService {
         userAccountRepository.saveAndFlush(userAccount);
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void softDelete() {
+        UserAccount currentUser = (UserAccount) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        currentUser.setIsDeleted(true);
+        userAccountRepository.save(currentUser);
+    }
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userAccountRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("Username not found"));
+        boolean existsByUsernameAndIsDeletedTrue = userAccountRepository.existsByUsernameAndIsDeletedTrue(username);
+        if (existsByUsernameAndIsDeletedTrue) {
+            throw new DisabledException("Account is deactivated!");
+        }
+        return userAccountRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(Constant.ERROR_USERNAME_NOT_FOUND));
     }
 }

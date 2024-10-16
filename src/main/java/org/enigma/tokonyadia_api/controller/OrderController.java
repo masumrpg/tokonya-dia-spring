@@ -46,6 +46,12 @@ public class OrderController {
         return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_GET_ORDER_DETAIL, orderDetailResponseList);
     }
 
+    // TODO removeOrderDetail
+    @DeleteMapping({"/{orderId}/details/{detailsId}"})
+    public ResponseEntity<?> removeOrderDetail(@PathVariable String orderId, @PathVariable String detailsId) {
+        return null;
+    }
+
     @GetMapping
     public ResponseEntity<?> getAllOrders(
             @RequestParam(name = "page", required = false, defaultValue = "1") Integer page,

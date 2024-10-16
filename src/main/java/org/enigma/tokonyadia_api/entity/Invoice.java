@@ -2,6 +2,7 @@ package org.enigma.tokonyadia_api.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.enigma.tokonyadia_api.audit.Auditable;
 import org.enigma.tokonyadia_api.constant.Constant;
 
 import java.time.LocalDateTime;
@@ -14,16 +15,16 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Invoice {
+public class Invoice extends Auditable<String> {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @Column(name = "invoice_number", nullable = false, unique = true)
+    @Column(name = "invoice_number", nullable = false, unique = true, length = 100)
     private String invoiceNumber;
 
     @ManyToOne
-    @JoinColumn(name = "person_id")
+    @JoinColumn(name = "person_id", nullable = false)
     private Person person;
 
     @Column(name = "total_amount", nullable = false)

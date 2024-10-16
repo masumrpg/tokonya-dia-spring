@@ -2,9 +2,8 @@ package org.enigma.tokonyadia_api.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.enigma.tokonyadia_api.audit.Auditable;
 import org.enigma.tokonyadia_api.constant.Constant;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Setter
@@ -13,7 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Table(name = Constant.PRODUCT_RATING_TABLE)
 @Builder
-public class ProductRating {
+public class ProductRating extends Auditable<String> {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
@@ -27,17 +26,8 @@ public class ProductRating {
     private Person person;
 
     @Column(name = "rating", nullable = false)
-    private Integer rating;
+    private Double rating;
 
     @Column(name = "review")
     private String review;
-
-    @Column(name = "created_at", updatable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime createdAt;
-
-    @PrePersist()
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
 }

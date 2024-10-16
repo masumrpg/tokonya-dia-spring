@@ -2,6 +2,7 @@ package org.enigma.tokonyadia_api.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.enigma.tokonyadia_api.audit.Auditable;
 import org.enigma.tokonyadia_api.constant.Constant;
 
 import java.time.LocalDateTime;
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Table(name = Constant.PRODUCT_PROMO_TABLE)
 @Builder
-public class ProductPromo {
+public class ProductPromo extends Auditable<String> {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;

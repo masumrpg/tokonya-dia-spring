@@ -2,6 +2,7 @@ package org.enigma.tokonyadia_api.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.enigma.tokonyadia_api.audit.Auditable;
 import org.enigma.tokonyadia_api.constant.Constant;
 
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @Table(name = Constant.PRODUCT_CATEGORY_TABLE)
 @Builder
-public class ProductCategory {
+public class ProductCategory extends Auditable<String> {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;

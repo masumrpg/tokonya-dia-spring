@@ -29,6 +29,8 @@ public class Constant {
     public static final String STORE_API = "/api/stores";
     public static final String ORDER_API = "/api/orders";
     public static final String PRODUCT_CATEGORY_API = "/api/products/categories";
+    public static final String SHIPMENT_API = "/api/shipments";
+    public static final String PRODUCT_RATING_API = "/api/products/ratings";
 
     // Message
     // user
@@ -42,6 +44,7 @@ public class Constant {
     public static final String SUCCESS_UPDATE_PERSON = "Successfully update person";
     public static final String SUCCESS_DELETE_PERSON = "Successfully delete person";
     public static final String SUCCESS_GET_ALL_PERSON = "Successfully get persons";
+    public static final String SUCCESS_DELETE_SELF = "Successfully delete self";
     // store
     public static final String SUCCESS_CREATED_STORE = "Successfully created store";
     public static final String SUCCESS_GET_STORE = "Successfully get store";
@@ -56,11 +59,20 @@ public class Constant {
     public static final String SUCCESS_GET_ALL_PRODUCT = "Successfully get products";
     // product category
     public static final String SUCCESS_GET_ALL_PRODUCT_CATEGORY = "Successfully retrieved products category";
+    // product rating
+    public static final String SUCCESS_CREATE_PRODUCT_RATING = "Successfully created product rating";
+    public static final String SUCCESS_GET_PRODUCT_RATING = "Successfully get product rating";
+    public static final String SUCCESS_UPDATE_PRODUCT_RATING = "Successfully update product rating";
+    public static final String SUCCESS_UPDATE_DELETE_RATING = "Successfully delete product rating";
+    public static final String SUCCESS_GET_ALL_PRODUCT_RATING = "Successfully get all product rating";
     // order
     public static final String SUCCESS_CREATED_ORDER = "Successfully created order";
     public static final String SUCCESS_CREATE_ORDER_DETAIL = "Successfully created order detail";
     public static final String SUCCESS_GET_ORDER = "Successfully get orders";
     public static final String SUCCESS_GET_ORDER_DETAIL = "Successfully get orders details";
+    // shipment
+    public static final String SUCCESS_GET_SHIPMENT = "Successfully get shipment";
+    public static final String SUCCESS_GET_ALL_SHIPMENT = "Successfully get all shipments";
 
     // Error
     // person
@@ -78,4 +90,8 @@ public class Constant {
     public static final String ERROR_ORDER_ALREADY_EXISTS = "Order draft already exists";
     public static final String ERROR_ORDER_NOT_FOUND = "Order not found";
     public static final String ERROR_ADD_ITEMS_TO_NON_DRAFT = "Error add items to non draft";
+    // shipment
+    public static final String ERROR_SHIPMENT_NOT_FOUND = "Shipment not found";
+    // product rating
+    public static final String PRODUCT_RATING_NOT_FOUND = "Product rating not found";
 }

@@ -29,4 +29,10 @@ public class UserAccountController {
         UserResponse userResponse = userAccountService.getAuthentication();
         return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_FETCH_USER_INFO, userResponse);
     }
+
+    @DeleteMapping("/me")
+    public ResponseEntity<?> deleteSelf() {
+        userAccountService.softDelete();
+        return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_DELETE_SELF, null);
+    }
 }

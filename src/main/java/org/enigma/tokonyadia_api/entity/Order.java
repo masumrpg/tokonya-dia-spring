@@ -2,6 +2,7 @@ package org.enigma.tokonyadia_api.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.enigma.tokonyadia_api.audit.Auditable;
 import org.enigma.tokonyadia_api.constant.Constant;
 import org.enigma.tokonyadia_api.constant.OrderStatus;
 import org.enigma.tokonyadia_api.constant.PaymentMethod;
@@ -16,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @Table(name = Constant.ORDER_TABLE)
 @Builder
-public class Order {
+public class Order extends Auditable<String> {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;

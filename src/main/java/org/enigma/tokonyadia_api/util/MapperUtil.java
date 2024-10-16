@@ -119,4 +119,28 @@ public class MapperUtil {
                 .endDateTime(productPromo.getEndDateTime().toString())
                 .build();
     }
+
+    public static ShipmentResponse toShipmentResponse(Shipment shipment) {
+        return ShipmentResponse.builder()
+                .shipmentId(shipment.getId())
+                .orderId(shipment.getOrder().getId())
+                .courierName(shipment.getCourierName().getDescription())
+                .receipt(shipment.getReceipt())
+                .deliveryDate(shipment.getDeliveryDate().toString())
+                .deliveryFrom(shipment.getDeliveryFrom())
+                .deliveryTo(shipment.getDeliveryTo())
+                .estimateDate(shipment.getEstimateDate().toString())
+                .status(shipment.getStatus().toString())
+                .build();
+    }
+
+    public static ProductRatingResponse toProductRatingResponse(ProductRating productRating) {
+        return ProductRatingResponse.builder()
+                .id(productRating.getId())
+                .productId(productRating.getProduct().getId())
+                .personId(productRating.getPerson().getId())
+                .rating(productRating.getRating())
+                .review(productRating.getReview())
+                .build();
+    }
 }

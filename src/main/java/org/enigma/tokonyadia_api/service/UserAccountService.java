@@ -16,4 +16,6 @@ public interface UserAccountService extends UserDetailsService {
     UserResponse getAuthentication();
 
     void updatePassword(String id, UserUpdatePasswordRequest request);
+
+    void softDelete();
 }
