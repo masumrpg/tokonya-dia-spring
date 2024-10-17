@@ -15,6 +15,7 @@ import org.enigma.tokonyadia_api.service.StoreService;
 import org.enigma.tokonyadia_api.specification.FilterSpecificationBuilder;
 import org.enigma.tokonyadia_api.util.MapperUtil;
 import org.enigma.tokonyadia_api.util.SortUtil;
+import org.enigma.tokonyadia_api.util.ValidationUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +23,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
@@ -34,9 +36,12 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final ProductCategoryService productCategoryService;
     private final StoreService storeService;
+    private final ValidationUtil validationUtil;
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public ProductResponse create(ProductRequest request) {
+        validationUtil.validate(request);
         Store store = storeService.getOneById(request.getStoreId());
         ProductCategory productCategory = productCategoryService.getOne(request.getCategoryId());
         Product product = Product.builder()
@@ -52,6 +57,7 @@ public class ProductServiceImpl implements ProductService {
         return toProductResponse(product);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Product getOneById(String id) {
         Optional<Product> byId = productRepository.findById(id);
@@ -61,13 +67,16 @@ public class ProductServiceImpl implements ProductService {
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found");
     }
 
+    @Transactional(readOnly = true)
     @Override
     public ProductResponse getById(String id) {
         return toProductResponse(getOneById(id));
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public ProductResponse update(String id, UpdateProductRequest request) {
+        validationUtil.validate(request);
         Store store = storeService.getOneById(request.getStoreId());
         ProductCategory productCategory = productCategoryService.getOne(request.getCategoryId());
 
@@ -82,11 +91,13 @@ public class ProductServiceImpl implements ProductService {
         return toProductResponse(existingProduct);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void delete(String id) {
         productRepository.delete(getOneById(id));
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<ProductResponse> getAll(SearchWithMinMaxRequest request) {
         Sort sortBy = SortUtil.parseSort(request.getSortBy());

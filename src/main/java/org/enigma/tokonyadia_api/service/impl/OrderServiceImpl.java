@@ -56,7 +56,6 @@ public class OrderServiceImpl implements OrderService {
         if (optionalOrder.isPresent()) {
             if (optionalOrder.get().getStatus().equals(OrderStatus.DRAFT))
                 throw new ResponseStatusException(HttpStatus.CONFLICT, Constant.ERROR_ORDER_ALREADY_EXISTS);
-            ;
         }
 
         Order newOrder = Order.builder()
@@ -69,6 +68,7 @@ public class OrderServiceImpl implements OrderService {
         return toOrderResponse(newOrder);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public OrderResponse getByOrderId(String orderId) {
         return MapperUtil.toOrderResponse(getOne(orderId));
@@ -76,11 +76,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public List<OrderDetailResponse> addOrderDetailByOrderId(String orderId, OrderDetailRequest request) {
-        boolean itemFound = false;
-        List<OrderDetailResponse> orderDetailResponses = new ArrayList<>();
-        List<OrderDetail> orderDetailList = new ArrayList<>();
-
+    public OrderResponse addOrderDetailByOrderId(String orderId, OrderDetailRequest request) {
         Order order = getOne(orderId);
         if (order.getStatus() != OrderStatus.DRAFT) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Constant.ERROR_ADD_ITEMS_TO_NON_DRAFT);
@@ -88,38 +84,90 @@ public class OrderServiceImpl implements OrderService {
 
         Product product = productService.getOneById(request.getProductId());
 
-        for (OrderDetail orderDetail : order.getOrderDetails()) {
-            if (orderDetail.getProduct().getId().equals(product.getId())) {
-                if (orderDetail.getQuantity() + 1 > product.getStock()) {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product stock is not enough");
-                }
-                orderDetail.setOrder(order);
-                orderDetail.setQuantity(orderDetail.getQuantity() + 1);
-                orderDetail.setPrice(product.getPrice());
-                orderDetailResponses.add(toOrderDetailResponse(orderDetail));
-                itemFound = true;
-                break;
-            }
-        }
+        Optional<OrderDetail> existingOrderDetail = order.getOrderDetails().stream()
+                .filter(orderDetail -> orderDetail.getProduct().getId().equals(product.getId()))
+                .findFirst();
 
-        if (!itemFound) {
+        List<OrderDetailResponse> orderDetailResponses = new ArrayList<>();
+
+        if (existingOrderDetail.isPresent()) {
+            OrderDetail orderDetail = existingOrderDetail.get();
+
+            if (orderDetail.getQuantity() + 1 > product.getStock()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product stock is not enough");
+            }
+
+            orderDetail.setOrder(order);
+            orderDetail.setQuantity(orderDetail.getQuantity() + 1);
+            orderDetail.setPrice(product.getPrice());
+            orderDetailResponses.add(toOrderDetailResponse(orderDetail));
+        } else {
+            if (1 > product.getStock()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product stock is not enough");
+            }
+
             OrderDetail newOrderDetail = OrderDetail.builder()
                     .product(product)
                     .order(order)
                     .quantity(1)
                     .price(product.getPrice())
                     .build();
+
             OrderDetail orderDetailAdded = orderDetailService.create(newOrderDetail);
-            orderDetailList.add(orderDetailAdded);
+            order.getOrderDetails().add(orderDetailAdded);
             orderDetailResponses.add(toOrderDetailResponse(orderDetailAdded));
-            order.getOrderDetails().addAll(orderDetailList);
 
             orderRepository.saveAndFlush(order);
         }
-        return orderDetailResponses;
+
+        return MapperUtil.toOrderResponse(order);
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public OrderResponse decreaseOrderDetailByOrderId(String orderId, OrderDetailRequest request) {
+        Order order = getOne(orderId);
+        if (order.getStatus() != OrderStatus.DRAFT) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Constant.ERROR_ADD_ITEMS_TO_NON_DRAFT);
+        }
 
+        Product product = productService.getOneById(request.getProductId());
+
+        order.getOrderDetails().forEach(orderDetail -> {
+            if (orderDetail.getProduct().getId().equals(product.getId())) {
+                if (orderDetail.getQuantity() == 1) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product can't decrease again");
+                } else {
+                    orderDetail.setQuantity(orderDetail.getQuantity() - 1);
+                    orderDetail.setPrice(product.getPrice());
+                }
+            } else {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order detail not found");
+            }
+        });
+
+        return MapperUtil.toOrderResponse(order);
+    }
+
+    // FIXME ga bisa di hapus yang di db
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public OrderResponse removeOrderDetailByOrderId(String orderId, String orderDetailId) {
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        if (order.getStatus() != OrderStatus.DRAFT) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Constant.ERROR_ADD_ITEMS_TO_NON_DRAFT);
+        }
+
+        order.getOrderDetails().removeIf(orderDetail -> orderDetail.getId().equals(orderDetailId));
+
+        orderRepository.saveAndFlush(order);
+
+        return MapperUtil.toOrderResponse(order);
+    }
+
+    // TODO checkout
+
+    @Transactional(readOnly = true)
     @Override
     public Order getOne(String orderId) {
         Optional<Order> byId = orderRepository.findById(orderId);
@@ -132,14 +180,16 @@ public class OrderServiceImpl implements OrderService {
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, Constant.ERROR_ORDER_NOT_FOUND);
     }
 
+    @Transactional(readOnly = true)
     @Override
-    public List<OrderDetailResponse> getDetailByOrderId(String orderId) {
+    public List<OrderDetailResponse> getAllDetailByOrderId(String orderId) {
         Order order = getOne(orderId);
         List<OrderDetail> orderDetailList = new ArrayList<>(order.getOrderDetails());
         return orderDetailList.stream().map(MapperUtil::toOrderDetailResponse).toList();
     }
 
-    
+
+    @Transactional(readOnly = true)
     @Override
     public Page<OrderResponse> getAll(SearchCommonRequest request) {
         Sort sortBy = SortUtil.parseSort(request.getSortBy());

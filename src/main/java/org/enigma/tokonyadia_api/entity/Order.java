@@ -42,7 +42,7 @@ public class Order extends Auditable<String> {
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime orderDate;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderDetail> orderDetails;
 
     @Column(name = "order_success_date")

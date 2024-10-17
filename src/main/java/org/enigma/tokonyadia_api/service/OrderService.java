@@ -12,9 +12,18 @@ import java.util.List;
 
 public interface OrderService {
     OrderResponse create(OrderRequest request);
+
     OrderResponse getByOrderId(String orderId);
-    List<OrderDetailResponse> addOrderDetailByOrderId(String orderId, OrderDetailRequest request);
+
+    OrderResponse addOrderDetailByOrderId(String orderId, OrderDetailRequest request);
+
+    OrderResponse decreaseOrderDetailByOrderId(String orderId, OrderDetailRequest request);
+
+    OrderResponse removeOrderDetailByOrderId(String orderId, String orderDetailId);
+
     Order getOne(String id);
-    List<OrderDetailResponse> getDetailByOrderId(String orderId);
+
+    List<OrderDetailResponse> getAllDetailByOrderId(String orderId);
+
     Page<OrderResponse> getAll(SearchCommonRequest request);
 }

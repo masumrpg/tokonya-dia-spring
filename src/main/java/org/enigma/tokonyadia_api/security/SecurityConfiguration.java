@@ -34,8 +34,10 @@ public class SecurityConfiguration {
                 .sessionManagement(config -> config.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(req ->
                         req.dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
+                                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/auth/refresh-token").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/users/reactivate").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/persons").permitAll()
                                 .anyRequest().authenticated()
                 )

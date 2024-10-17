@@ -16,7 +16,7 @@ import org.enigma.tokonyadia_api.service.UserAccountService;
 import org.enigma.tokonyadia_api.specification.FilterSpecificationBuilder;
 import org.enigma.tokonyadia_api.util.MapperUtil;
 import org.enigma.tokonyadia_api.util.SortUtil;
-import org.enigma.tokonyadia_api.util.Verify;
+import org.enigma.tokonyadia_api.util.ValidationUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -36,13 +36,12 @@ import static org.enigma.tokonyadia_api.util.MapperUtil.*;
 public class PersonServiceImpl implements PersonService {
     private final PersonRepository personRepository;
     private final UserAccountService userAccountService;
+    private final ValidationUtil validationUtil;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
     public PersonResponse create(RegisterCreateRequest request) {
-        Verify.personByEmail(request.getEmail(), personRepository);
-        Verify.personByPhone(request.getPhoneNumber(), personRepository);
-
+        validationUtil.validate(request);
         if (request.getRole().equals(UserRole.ROLE_ADMIN.getDescription())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bad request");
         }
@@ -67,9 +66,7 @@ public class PersonServiceImpl implements PersonService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Person create(Person person) {
-        Verify.personByEmail(person.getEmail(), personRepository);
-        Verify.personByPhone(person.getPhoneNumber(), personRepository);
-
+        validationUtil.validate(person);
         personRepository.saveAndFlush(person);
         return person;
     }
@@ -93,9 +90,7 @@ public class PersonServiceImpl implements PersonService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public PersonResponse update(String id, UpdatePersonRequest request) {
-        Verify.personByPhone(request.getPhoneNumber(), personRepository);
-        Verify.personByEmail(request.getEmail(), personRepository);
-
+        validationUtil.validate(request);
         Person person = getOneById(id);
         person.setName(request.getName());
         person.setImgUrl(request.getImgUrl());

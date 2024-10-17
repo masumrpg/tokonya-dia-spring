@@ -18,4 +18,6 @@ public interface UserAccountService extends UserDetailsService {
     void updatePassword(String id, UserUpdatePasswordRequest request);
 
     void softDelete();
+
+    void reactiveSelf(UserRequest request);
 }

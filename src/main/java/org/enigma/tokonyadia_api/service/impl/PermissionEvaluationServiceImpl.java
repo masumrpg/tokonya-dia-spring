@@ -9,12 +9,14 @@ import org.enigma.tokonyadia_api.service.PermissionEvaluationService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class PermissionEvaluationServiceImpl implements PermissionEvaluationService {
     private final PersonService personService;
 
+    @Transactional(readOnly = true)
     @Override
     public boolean hasAccessToCustomerAndSeller(String personId, String userId) {
         Person person = personService.getOneById(personId);

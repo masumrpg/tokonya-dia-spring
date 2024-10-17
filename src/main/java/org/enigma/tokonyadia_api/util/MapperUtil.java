@@ -114,7 +114,9 @@ public class MapperUtil {
     public static ProductPromoResponse toProductPromoResponse(ProductPromo productPromo) {
         return ProductPromoResponse.builder()
                 .id(productPromo.getId())
-                .discountPercentage(productPromo.getDiscountPercentage())
+                .promoId(productPromo.getProduct().getId())
+                .promoCode(productPromo.getPromoCode())
+                .discount(productPromo.getDiscountPercentage())
                 .startDateTime(productPromo.getStartDateTime().toString())
                 .endDateTime(productPromo.getEndDateTime().toString())
                 .build();

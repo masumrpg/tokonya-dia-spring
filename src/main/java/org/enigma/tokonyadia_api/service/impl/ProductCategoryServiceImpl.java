@@ -11,6 +11,7 @@ import org.enigma.tokonyadia_api.service.ProductCategoryService;
 import org.enigma.tokonyadia_api.specification.FilterSpecificationBuilder;
 import org.enigma.tokonyadia_api.util.MapperUtil;
 import org.enigma.tokonyadia_api.util.SortUtil;
+import org.enigma.tokonyadia_api.util.ValidationUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
@@ -28,9 +30,12 @@ import static org.enigma.tokonyadia_api.util.MapperUtil.toProductCategoryRespons
 @RequiredArgsConstructor
 public class ProductCategoryServiceImpl implements ProductCategoryService {
     private final ProductCategoryRepository productCategoryRepository;
+    private final ValidationUtil validationUtil;
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public ProductCategoryResponse create(ProductCategoryRequest request) {
+        validationUtil.validate(request);
         ProductCategory productCategory = ProductCategory.builder()
                 .name(request.getName())
                 .description(request.getDescription())
@@ -39,19 +44,23 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
         return toProductCategoryResponse(productCategory);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public ProductCategoryResponse getById(String id) {
         return toProductCategoryResponse(getOne(id));
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public ProductCategory getOne(String id) {
         Optional<ProductCategory> optionalProductCategory = productCategoryRepository.findById(id);
         return optionalProductCategory.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, Constant.PRODUCT_CATEGORY_NOT_FOUND));
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public ProductCategoryResponse update(String id, ProductCategoryRequest request) {
+        validationUtil.validate(request);
         ProductCategory productCategory = getOne(id);
         productCategory.setName(request.getName());
         productCategory.setDescription(request.getDescription());
@@ -59,12 +68,14 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
         return toProductCategoryResponse(productCategory);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void delete(String id) {
         ProductCategory productCategory = getOne(id);
         productCategoryRepository.delete(productCategory);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<ProductCategoryResponse> getAll(SearchCommonRequest request) {
         Sort sortBy = SortUtil.parseSort(request.getSortBy());

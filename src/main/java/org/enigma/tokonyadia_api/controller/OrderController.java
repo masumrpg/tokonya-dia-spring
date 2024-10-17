@@ -1,5 +1,6 @@
 package org.enigma.tokonyadia_api.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.enigma.tokonyadia_api.constant.Constant;
 import org.enigma.tokonyadia_api.dto.request.OrderDetailRequest;
@@ -19,6 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping(Constant.ORDER_API)
 @RequiredArgsConstructor
+@SecurityRequirement(name = "Bearer Authentication")
 public class OrderController {
     private final OrderService orderService;
 
@@ -34,22 +36,28 @@ public class OrderController {
         return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_GET_ORDER, oderResponse);
     }
 
-    @PostMapping("/{orderId}/details")
+    @PostMapping("/{orderId}/details/add")
     public ResponseEntity<?> addOrderDetailsById(@PathVariable String orderId, @RequestBody OrderDetailRequest request) {
-        List<OrderDetailResponse> orderDetailResponseList = orderService.addOrderDetailByOrderId(orderId, request);
+        OrderResponse orderDetailResponseList = orderService.addOrderDetailByOrderId(orderId, request);
         return ResponseUtil.buildCommonResponse(HttpStatus.CREATED, Constant.SUCCESS_CREATE_ORDER_DETAIL, orderDetailResponseList);
     }
 
-    @GetMapping("/{orderId}/details")
-    public ResponseEntity<?> getOrderDetailsById(@PathVariable String orderId) {
-        List<OrderDetailResponse> orderDetailResponseList = orderService.getDetailByOrderId(orderId);
-        return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_GET_ORDER_DETAIL, orderDetailResponseList);
+    @PostMapping("/{orderId}/details/decrease")
+    public ResponseEntity<?> decreaseOrderById(@PathVariable String orderId, @RequestBody OrderDetailRequest request) {
+        OrderResponse orderDetailResponses = orderService.decreaseOrderDetailByOrderId(orderId, request);
+        return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_DECREASE_ORDER_DETAIL, orderDetailResponses);
     }
 
-    // TODO removeOrderDetail
-    @DeleteMapping({"/{orderId}/details/{detailsId}"})
-    public ResponseEntity<?> removeOrderDetail(@PathVariable String orderId, @PathVariable String detailsId) {
-        return null;
+    @DeleteMapping("/{orderId}/details/{orderDetailId}")
+    public ResponseEntity<?> removeOrderDetailById(@PathVariable String orderId, @PathVariable String orderDetailId) {
+        OrderResponse orderResponse = orderService.removeOrderDetailByOrderId(orderId, orderDetailId);
+        return ResponseUtil.buildCommonResponse(HttpStatus.OK, "Successfully remove detail order", orderResponse);
+    }
+
+    @GetMapping("/{orderId}/details")
+    public ResponseEntity<?> getAllOrderDetailsById(@PathVariable String orderId) {
+        List<OrderDetailResponse> orderDetailResponseList = orderService.getAllDetailByOrderId(orderId);
+        return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_GET_ORDER_DETAIL, orderDetailResponseList);
     }
 
     @GetMapping

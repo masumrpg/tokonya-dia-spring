@@ -9,10 +9,10 @@ import org.enigma.tokonyadia_api.dto.request.UserUpdatePasswordRequest;
 import org.enigma.tokonyadia_api.dto.response.UserResponse;
 import org.enigma.tokonyadia_api.entity.UserAccount;
 import org.enigma.tokonyadia_api.repository.UserAccountRepository;
+import org.enigma.tokonyadia_api.service.AuthService;
 import org.enigma.tokonyadia_api.service.UserAccountService;
 import org.enigma.tokonyadia_api.util.MapperUtil;
 import org.enigma.tokonyadia_api.util.ValidationUtil;
-import org.enigma.tokonyadia_api.util.Verify;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.DisabledException;
@@ -24,6 +24,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +43,7 @@ public class UserAccountServiceImpl implements UserAccountService {
     private String PASSWORD_ADMIN;
 
 
+    @Transactional(rollbackFor = Exception.class)
     @PostConstruct
     public void initUser() {
         boolean exist = userAccountRepository.existsByUsername(USERNAME_ADMIN);
@@ -61,7 +64,6 @@ public class UserAccountServiceImpl implements UserAccountService {
     @Override
     public UserResponse create(UserRequest request) {
         validationUtil.validate(request);
-        Verify.userByUsername(request.getUsername(), userAccountRepository);
 
         UserAccount userAccount = UserAccount.builder()
                 .username(request.getUsername())
@@ -72,18 +74,21 @@ public class UserAccountServiceImpl implements UserAccountService {
         return MapperUtil.toUserResponse(userAccount);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public UserAccount create(UserAccount userAccount) {
-        Verify.userByUsername(userAccount.getUsername(), userAccountRepository);
+        validationUtil.validate(userAccount);
         userAccount.setPassword(passwordEncoder.encode(userAccount.getPassword()));
         return userAccountRepository.saveAndFlush(userAccount);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public UserAccount getById(String id) {
         return userAccountRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, Constant.ERROR_USERNAME_NOT_FOUND));
     }
 
+    @Transactional(readOnly = true)
     @Override
     public UserResponse getAuthentication() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -113,6 +118,18 @@ public class UserAccountServiceImpl implements UserAccountService {
         userAccountRepository.save(currentUser);
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void reactiveSelf(UserRequest request) {
+        Optional<UserAccount> optionalUserAccount = userAccountRepository.findByUsername(request.getUsername());
+        if (optionalUserAccount.isEmpty() || optionalUserAccount.get().getIsDeleted().equals(false))
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, Constant.ERROR_USERNAME_NOT_FOUND);
+        UserAccount userAccount = optionalUserAccount.get();
+        userAccount.setIsDeleted(false);
+        userAccountRepository.save(userAccount);
+    }
+
+    // TODO add ref link to reactive
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         boolean existsByUsernameAndIsDeletedTrue = userAccountRepository.existsByUsernameAndIsDeletedTrue(username);

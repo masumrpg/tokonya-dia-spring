@@ -31,12 +31,14 @@ public class Constant {
     public static final String PRODUCT_CATEGORY_API = "/api/products/categories";
     public static final String SHIPMENT_API = "/api/shipments";
     public static final String PRODUCT_RATING_API = "/api/products/ratings";
+    public static final String PRODUCT_PROMO_API = "/api/products/promos";
 
     // Message
     // user
     public static final String SUCCESS_CREATE_USER = "Successfully created user";
     public static final String SUCCESS_LOGIN = "Success login";
     public static final String SUCCESS_FETCH_USER_INFO = "Successfully fetch info user";
+    public static final String SUCCESS_REACTIVATE_ACCOUNT = "Successfully reactivate account";
 
     // person
     public static final String SUCCESS_CREATED_PERSON = "Successfully created person";
@@ -70,9 +72,17 @@ public class Constant {
     public static final String SUCCESS_CREATE_ORDER_DETAIL = "Successfully created order detail";
     public static final String SUCCESS_GET_ORDER = "Successfully get orders";
     public static final String SUCCESS_GET_ORDER_DETAIL = "Successfully get orders details";
+    // order detail
+    public static final String SUCCESS_DECREASE_ORDER_DETAIL = "Successfully decrease order detail";
     // shipment
     public static final String SUCCESS_GET_SHIPMENT = "Successfully get shipment";
     public static final String SUCCESS_GET_ALL_SHIPMENT = "Successfully get all shipments";
+    // promo
+    public static final String SUCCESS_CREATE_PROMO = "Successfully create promo";
+    public static final String SUCCESS_GET_PRODUCT_PROMO = "Successfully get promo";
+    public static final String SUCCESS_UPDATE_PRODUCT_PROMO = "Successfully update promo";
+    public static final String SUCCESS_DELETE_PRODUCT_PROMO = "Successfully delete promo";
+    public static final String SUCCESS_GET_ALL_PRODUCT_PROMO = "Successfully get all promo";
 
     // Error
     // person
@@ -83,6 +93,8 @@ public class Constant {
     public static final String PRODUCT_CATEGORY_NOT_FOUND = "Product category not found";
     public static final String INVALID_CREDENTIALS = "Invalid credentials";
     public static final String ERROR_USERNAME_NOT_FOUND = "User not found";
+    // store
+    public static final String ERROR_STORE_NOT_FOUND = "Store not found";
     // jwt
     public static final String ERROR_CREATE_JWT = "Error creating JWT";
     public static final String SUCCESS_GENERATED_ACCESS_TOKEN = "Success generated access token";
@@ -94,4 +106,6 @@ public class Constant {
     public static final String ERROR_SHIPMENT_NOT_FOUND = "Shipment not found";
     // product rating
     public static final String PRODUCT_RATING_NOT_FOUND = "Product rating not found";
+    // product promo
+    public static final String ERROR_PRODUCT_PROMO_NOT_FOUND = "Product promo not found";
 }

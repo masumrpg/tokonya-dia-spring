@@ -1,5 +1,7 @@
 package org.enigma.tokonyadia_api.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.enigma.tokonyadia_api.constant.Constant;
 import org.enigma.tokonyadia_api.dto.request.RegisterCreateRequest;
@@ -17,6 +19,8 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(Constant.PERSON_API)
 @RequiredArgsConstructor
+@SecurityRequirement(name = "Bearer Authentication")
+@Tag(name = "Person Management")
 public class PersonController {
     private final PersonService personService;
 

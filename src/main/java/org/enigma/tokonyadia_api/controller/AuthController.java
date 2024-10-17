@@ -1,5 +1,6 @@
 package org.enigma.tokonyadia_api.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -46,6 +47,7 @@ public class AuthController {
         return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_GENERATED_ACCESS_TOKEN, authResponse);
     }
 
+    @SecurityRequirement(name = "Bearer Authentication")
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request) {
         String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION);

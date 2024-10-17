@@ -20,15 +20,18 @@ public class ProductPromo extends Auditable<String> {
     private String id;
 
     @ManyToOne
-    @JoinColumn(name = "product_id")
+    @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @Column(name = "discount_percentage")
+    @Column(name = "promo_code", nullable = false, unique = true)
+    private String promoCode;
+
+    @Column(name = "discount_percentage", nullable = false)
     private Double discountPercentage;
 
-    @Column(name = "start_date_time")
+    @Column(name = "start_date_time", nullable = false)
     private LocalDateTime startDateTime;
 
-    @Column(name = "end_date_time")
+    @Column(name = "end_date_time", nullable = false)
     private LocalDateTime endDateTime;
 }

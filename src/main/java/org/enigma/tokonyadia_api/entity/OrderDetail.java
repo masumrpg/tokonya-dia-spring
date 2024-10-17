@@ -17,8 +17,8 @@ public class OrderDetail extends Auditable<String> {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id")
+    @ManyToOne
+    @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
     @ManyToOne

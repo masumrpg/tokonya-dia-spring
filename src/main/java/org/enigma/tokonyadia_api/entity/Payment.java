@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.enigma.tokonyadia_api.audit.Auditable;
 import org.enigma.tokonyadia_api.constant.Constant;
+import org.enigma.tokonyadia_api.constant.PaymentMethod;
 
 @Entity
 @Setter
@@ -17,12 +18,13 @@ public class Payment extends Auditable<String> {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @Column(name = "name")
-    private String name;
+    @Column(name = "payment_method")
+    @Enumerated(EnumType.STRING)
+    private PaymentMethod paymentMethod;
 
     @Column(name = "midtrans_code")
     private String midtransCode;
 
-    @Column(name = "is_active")
-    private Boolean isActive;
+    @Column(name = "status")
+    private String status;
 }

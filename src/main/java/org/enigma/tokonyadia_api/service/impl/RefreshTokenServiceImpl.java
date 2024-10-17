@@ -3,8 +3,10 @@ package org.enigma.tokonyadia_api.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.enigma.tokonyadia_api.service.RedisService;
 import org.enigma.tokonyadia_api.service.RefreshTokenService;
+import org.enigma.tokonyadia_api.util.ValidationUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.util.UUID;
@@ -17,6 +19,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     private final RedisService redisService;
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public String createToken(String userId) {
         String refreshToken = UUID.randomUUID().toString();
@@ -30,6 +33,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         return refreshToken;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteRefreshToken(String userId) {
         String token = redisService.get("refreshToken:" + userId);
@@ -37,12 +41,14 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         redisService.delete("refreshTokenMap:" + token);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public String rotateRefreshToken(String userId) {
         deleteRefreshToken(userId);
         return createToken(userId);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public String getUserIdByToken(String token) {
         return redisService.get("refreshTokenMap:" + token);

@@ -10,6 +10,7 @@ import org.enigma.tokonyadia_api.service.ShipmentService;
 import org.enigma.tokonyadia_api.specification.FilterSpecificationBuilder;
 import org.enigma.tokonyadia_api.util.MapperUtil;
 import org.enigma.tokonyadia_api.util.SortUtil;
+import org.enigma.tokonyadia_api.util.ValidationUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
@@ -25,19 +27,23 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ShipmentServiceImpl implements ShipmentService {
     private final ShipmentRepository shipmentRepository;
+    private final ValidationUtil validationUtil;
 
+    @Transactional(readOnly = true)
     @Override
     public ShipmentResponse getById(String shipmentId) {
         Shipment shipment = getOne(shipmentId);
         return MapperUtil.toShipmentResponse(shipment);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Shipment getOne(String shipmentId) {
         Optional<Shipment> optionalShipment = shipmentRepository.findById(shipmentId);
         return optionalShipment.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, Constant.ERROR_SHIPMENT_NOT_FOUND));
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<ShipmentResponse> getAll(SearchCommonRequest request) {
         Sort sortBy = SortUtil.parseSort(request.getSortBy());
