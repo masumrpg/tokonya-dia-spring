@@ -12,6 +12,7 @@ import lombok.*;
 public class StoreRequest {
     private String siup;
     private String name;
+    private String personId;
     private String phoneNumber;
     private String address;
 }

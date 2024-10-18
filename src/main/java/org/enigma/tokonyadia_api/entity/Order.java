@@ -5,7 +5,6 @@ import lombok.*;
 import org.enigma.tokonyadia_api.audit.Auditable;
 import org.enigma.tokonyadia_api.constant.Constant;
 import org.enigma.tokonyadia_api.constant.OrderStatus;
-import org.enigma.tokonyadia_api.constant.PaymentMethod;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,28 +25,20 @@ public class Order extends Auditable<String> {
     @JoinColumn(name = "person_id", nullable = false)
     private Person person;
 
-    @Column(name = "payment_method")
-    @Enumerated(EnumType.STRING)
-    private PaymentMethod paymentMethod;
-
-    @ManyToOne
-    @JoinColumn(name = "payment_id")
-    private Payment payment;
-
-    @Column(name = "status")
-    @Enumerated(EnumType.STRING)
-    private OrderStatus status;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    private List<OrderDetail> orderDetails;
 
     @Column(name = "order_date", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime orderDate;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    private List<OrderDetail> orderDetails;
+    @ManyToOne
+    @JoinColumn(name = "payment_id")
+    private Payment payment;
 
-    @Column(name = "order_success_date")
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime orderSuccessDate;
+    @Column(name = "order_status")
+    @Enumerated(EnumType.STRING)
+    private OrderStatus orderStatus;
 
     @OneToMany(mappedBy = "order", orphanRemoval = true)
     private List<Shipment> shipment;
@@ -55,9 +46,5 @@ public class Order extends Auditable<String> {
     @PrePersist
     protected void onCreate() {
         this.orderDate = LocalDateTime.now();
-    }
-
-    public void setToSuccessDate() {
-        this.orderSuccessDate = LocalDateTime.now();
     }
 }

@@ -10,8 +10,9 @@ import lombok.*;
 @Builder
 public class StoreResponse {
     private String id;
-    private String siup;
     private String name;
+    private String personId;
+    private String siup;
     private String phoneNumber;
     private String address;
 }

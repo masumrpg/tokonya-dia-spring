@@ -32,6 +32,7 @@ public class Constant {
     public static final String SHIPMENT_API = "/api/shipments";
     public static final String PRODUCT_RATING_API = "/api/products/ratings";
     public static final String PRODUCT_PROMO_API = "/api/products/promos";
+    public static final String PAYMENT_API = "/api/payments";
 
     // Message
     // user
@@ -72,8 +73,11 @@ public class Constant {
     public static final String SUCCESS_CREATE_ORDER_DETAIL = "Successfully created order detail";
     public static final String SUCCESS_GET_ORDER = "Successfully get orders";
     public static final String SUCCESS_GET_ORDER_DETAIL = "Successfully get orders details";
+    public static final String SUCCESS_CHECKOUT = "Checkout Success";
     // order detail
     public static final String SUCCESS_DECREASE_ORDER_DETAIL = "Successfully decrease order detail";
+    // Checkout
+    public static final String SUCCESS_CHECKOUT_ORDER = "Successfully checkout order";
     // shipment
     public static final String SUCCESS_GET_SHIPMENT = "Successfully get shipment";
     public static final String SUCCESS_GET_ALL_SHIPMENT = "Successfully get all shipments";
@@ -83,6 +87,8 @@ public class Constant {
     public static final String SUCCESS_UPDATE_PRODUCT_PROMO = "Successfully update promo";
     public static final String SUCCESS_DELETE_PRODUCT_PROMO = "Successfully delete promo";
     public static final String SUCCESS_GET_ALL_PRODUCT_PROMO = "Successfully get all promo";
+    // OK
+    public static final String OK = "OK";
 
     // Error
     // person
@@ -102,10 +108,14 @@ public class Constant {
     public static final String ERROR_ORDER_ALREADY_EXISTS = "Order draft already exists";
     public static final String ERROR_ORDER_NOT_FOUND = "Order not found";
     public static final String ERROR_ADD_ITEMS_TO_NON_DRAFT = "Error add items to non draft";
+    public static final String ERROR_CHECKOUT_NON_DRAFT = "Error checkout non draft";
+    public static final String ERROR_ORDER_CANNOT_EMPTY = "Error order cannot be empty";
+    public static final String ERROR_ORDER_IS_NOT_PENDING = "Order is not PENDING";
     // shipment
     public static final String ERROR_SHIPMENT_NOT_FOUND = "Shipment not found";
     // product rating
     public static final String PRODUCT_RATING_NOT_FOUND = "Product rating not found";
     // product promo
     public static final String ERROR_PRODUCT_PROMO_NOT_FOUND = "Product promo not found";
+    public static final String ERROR_REMOVE_ITEMS_FROM_NON_DRAFT = "Error remove items from non draft";
 }

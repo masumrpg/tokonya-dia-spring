@@ -7,6 +7,7 @@ import org.enigma.tokonyadia_api.constant.OrderStatus;
 import org.enigma.tokonyadia_api.dto.request.OrderDetailRequest;
 import org.enigma.tokonyadia_api.dto.request.SearchCommonRequest;
 import org.enigma.tokonyadia_api.dto.request.OrderRequest;
+import org.enigma.tokonyadia_api.dto.request.UpdateOrderStatusRequest;
 import org.enigma.tokonyadia_api.dto.response.OrderDetailResponse;
 import org.enigma.tokonyadia_api.dto.response.OrderResponse;
 import org.enigma.tokonyadia_api.entity.Person;
@@ -21,6 +22,7 @@ import org.enigma.tokonyadia_api.service.ProductService;
 import org.enigma.tokonyadia_api.specification.FilterSpecificationBuilder;
 import org.enigma.tokonyadia_api.util.MapperUtil;
 import org.enigma.tokonyadia_api.util.SortUtil;
+import org.enigma.tokonyadia_api.util.ValidationUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -45,22 +47,25 @@ public class OrderServiceImpl implements OrderService {
     private final PersonService personService;
     private final OrderDetailService orderDetailService;
     private final ProductService productService;
+    private final ValidationUtil validationUtil;
 
 
     @Transactional(rollbackFor = Exception.class)
     @Override
     public OrderResponse create(OrderRequest request) {
+        validationUtil.validate(request);
         Person person = personService.getOneById(request.getPersonId());
 
-        Optional<Order> optionalOrder = orderRepository.findByPerson(person);
-        if (optionalOrder.isPresent()) {
-            if (optionalOrder.get().getStatus().equals(OrderStatus.DRAFT))
+        List<Order> orderList = orderRepository.findByPerson(person);
+
+        for (Order order : orderList) {
+            if (order != null && order.getOrderStatus().equals(OrderStatus.DRAFT))
                 throw new ResponseStatusException(HttpStatus.CONFLICT, Constant.ERROR_ORDER_ALREADY_EXISTS);
         }
 
         Order newOrder = Order.builder()
                 .person(person)
-                .status(OrderStatus.DRAFT)
+                .orderStatus(OrderStatus.DRAFT)
                 .orderDetails(new ArrayList<>())
                 .build();
         orderRepository.saveAndFlush(newOrder);
@@ -77,8 +82,9 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public OrderResponse addOrderDetailByOrderId(String orderId, OrderDetailRequest request) {
+        validationUtil.validate(request);
         Order order = getOne(orderId);
-        if (order.getStatus() != OrderStatus.DRAFT) {
+        if (order.getOrderStatus() != OrderStatus.DRAFT) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Constant.ERROR_ADD_ITEMS_TO_NON_DRAFT);
         }
 
@@ -87,8 +93,6 @@ public class OrderServiceImpl implements OrderService {
         Optional<OrderDetail> existingOrderDetail = order.getOrderDetails().stream()
                 .filter(orderDetail -> orderDetail.getProduct().getId().equals(product.getId()))
                 .findFirst();
-
-        List<OrderDetailResponse> orderDetailResponses = new ArrayList<>();
 
         if (existingOrderDetail.isPresent()) {
             OrderDetail orderDetail = existingOrderDetail.get();
@@ -100,7 +104,6 @@ public class OrderServiceImpl implements OrderService {
             orderDetail.setOrder(order);
             orderDetail.setQuantity(orderDetail.getQuantity() + 1);
             orderDetail.setPrice(product.getPrice());
-            orderDetailResponses.add(toOrderDetailResponse(orderDetail));
         } else {
             if (1 > product.getStock()) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product stock is not enough");
@@ -113,12 +116,10 @@ public class OrderServiceImpl implements OrderService {
                     .price(product.getPrice())
                     .build();
 
-            OrderDetail orderDetailAdded = orderDetailService.create(newOrderDetail);
-            order.getOrderDetails().add(orderDetailAdded);
-            orderDetailResponses.add(toOrderDetailResponse(orderDetailAdded));
-
-            orderRepository.saveAndFlush(order);
+            order.getOrderDetails().add(newOrderDetail);
         }
+
+        orderRepository.saveAndFlush(order);
 
         return MapperUtil.toOrderResponse(order);
     }
@@ -126,8 +127,9 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public OrderResponse decreaseOrderDetailByOrderId(String orderId, OrderDetailRequest request) {
+        validationUtil.validate(request);
         Order order = getOne(orderId);
-        if (order.getStatus() != OrderStatus.DRAFT) {
+        if (order.getOrderStatus() != OrderStatus.DRAFT) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Constant.ERROR_ADD_ITEMS_TO_NON_DRAFT);
         }
 
@@ -152,20 +154,49 @@ public class OrderServiceImpl implements OrderService {
     // FIXME ga bisa di hapus yang di db
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public OrderResponse removeOrderDetailByOrderId(String orderId, String orderDetailId) {
-        Order order = orderRepository.findById(orderId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        if (order.getStatus() != OrderStatus.DRAFT) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Constant.ERROR_ADD_ITEMS_TO_NON_DRAFT);
+    public OrderResponse removeOrderDetail(String orderId, String detailId) {
+        Order order = getOne(orderId);
+        if (order.getOrderStatus() != OrderStatus.DRAFT) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Constant.ERROR_REMOVE_ITEMS_FROM_NON_DRAFT);
         }
 
-        order.getOrderDetails().removeIf(orderDetail -> orderDetail.getId().equals(orderDetailId));
+        OrderDetail detailToRemove = order.getOrderDetails().stream()
+                .filter(detail -> detail.getId().equals(detailId))
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order detail not found"));
 
-        orderRepository.saveAndFlush(order);
+        order.getOrderDetails().remove(detailToRemove);
 
-        return MapperUtil.toOrderResponse(order);
+        Order updatedOrder = orderRepository.save(order);
+        return MapperUtil.toOrderResponse(updatedOrder);
     }
 
-    // TODO checkout
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public OrderResponse checkoutOrder(String orderId) {
+        Order order = getOne(orderId);
+        if (order.getOrderStatus() != OrderStatus.DRAFT)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Constant.ERROR_CHECKOUT_NON_DRAFT);
+
+        if (order.getOrderDetails().isEmpty())
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Constant.ERROR_ORDER_CANNOT_EMPTY);
+
+        order.setOrderStatus(OrderStatus.PENDING);
+        Order updatedOrder = orderRepository.saveAndFlush(order);
+
+        return MapperUtil.toOrderResponse(updatedOrder);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public OrderResponse updateOrderStatus(String orderId, UpdateOrderStatusRequest request) {
+        validationUtil.validate(request);
+        Order order = getOne(orderId);
+        order.setOrderStatus(request.getStatus());
+        Order updatedOrder = orderRepository.save(order);
+        return MapperUtil.toOrderResponse(updatedOrder);
+    }
 
     @Transactional(readOnly = true)
     @Override

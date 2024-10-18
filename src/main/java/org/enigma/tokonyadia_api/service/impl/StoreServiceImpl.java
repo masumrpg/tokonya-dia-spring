@@ -5,8 +5,10 @@ import org.enigma.tokonyadia_api.constant.Constant;
 import org.enigma.tokonyadia_api.dto.request.SearchCommonRequest;
 import org.enigma.tokonyadia_api.dto.request.StoreRequest;
 import org.enigma.tokonyadia_api.dto.response.StoreResponse;
+import org.enigma.tokonyadia_api.entity.Person;
 import org.enigma.tokonyadia_api.entity.Store;
 import org.enigma.tokonyadia_api.repository.StoreRepository;
+import org.enigma.tokonyadia_api.service.PersonService;
 import org.enigma.tokonyadia_api.service.StoreService;
 import org.enigma.tokonyadia_api.specification.FilterSpecificationBuilder;
 import org.enigma.tokonyadia_api.util.MapperUtil;
@@ -31,17 +33,20 @@ import static org.enigma.tokonyadia_api.util.MapperUtil.toStoreResponse;
 @RequiredArgsConstructor
 public class StoreServiceImpl implements StoreService {
     private final StoreRepository storeRepository;
+    private final PersonService personService;
     private final ValidationUtil validationUtil;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public StoreResponse create(StoreRequest storeRequest) {
-        validationUtil.validate(storeRequest);
+    public StoreResponse create(StoreRequest request) {
+        validationUtil.validate(request);
+        Person person = personService.getOneById(request.getPersonId());
         Store store = Store.builder()
-                .name(storeRequest.getName())
-                .phoneNumber(storeRequest.getPhoneNumber())
-                .siup(storeRequest.getSiup())
-                .address(storeRequest.getAddress())
+                .name(request.getName())
+                .person(person)
+                .phoneNumber(request.getPhoneNumber())
+                .siup(request.getSiup())
+                .address(request.getAddress())
                 .build();
         storeRepository.saveAndFlush(store);
         return toStoreResponse(store);
@@ -55,13 +60,13 @@ public class StoreServiceImpl implements StoreService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public StoreResponse update(String id, StoreRequest storeRequest) {
-        validationUtil.validate(storeRequest);
+    public StoreResponse update(String id, StoreRequest request) {
+        validationUtil.validate(request);
         Store store = getOneById(id);
-        store.setName(storeRequest.getName());
-        store.setPhoneNumber(storeRequest.getPhoneNumber());
-        store.setSiup(storeRequest.getSiup());
-        store.setAddress(storeRequest.getAddress());
+        store.setName(request.getName());
+        store.setPhoneNumber(request.getPhoneNumber());
+        store.setSiup(request.getSiup());
+        store.setAddress(request.getAddress());
         storeRepository.save(store);
         return toStoreResponse(store);
     }

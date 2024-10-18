@@ -7,10 +7,15 @@ import org.enigma.tokonyadia_api.entity.Store;
 import org.springframework.data.domain.Page;
 
 public interface StoreService {
-    StoreResponse create(StoreRequest storeRequest);
+    StoreResponse create(StoreRequest request);
+
     Store getOneById(String id);
+
     StoreResponse getById(String id);
-    StoreResponse update(String id, StoreRequest store);
+
+    StoreResponse update(String id, StoreRequest request);
+
     void delete(String id);
+
     Page<StoreResponse> getAll(SearchCommonRequest request);
 }

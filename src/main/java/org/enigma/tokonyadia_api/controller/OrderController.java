@@ -50,8 +50,14 @@ public class OrderController {
 
     @DeleteMapping("/{orderId}/details/{orderDetailId}")
     public ResponseEntity<?> removeOrderDetailById(@PathVariable String orderId, @PathVariable String orderDetailId) {
-        OrderResponse orderResponse = orderService.removeOrderDetailByOrderId(orderId, orderDetailId);
+        OrderResponse orderResponse = orderService.removeOrderDetail(orderId, orderDetailId);
         return ResponseUtil.buildCommonResponse(HttpStatus.OK, "Successfully remove detail order", orderResponse);
+    }
+
+    @PostMapping("/{orderId}/checkout")
+    public ResponseEntity<?> checkoutOrder(@PathVariable String orderId) {
+        OrderResponse orderResponse = orderService.checkoutOrder(orderId);
+        return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_CHECKOUT_ORDER, orderResponse);
     }
 
     @GetMapping("/{orderId}/details")

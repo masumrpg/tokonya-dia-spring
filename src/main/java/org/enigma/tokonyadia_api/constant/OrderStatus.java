@@ -1,5 +1,10 @@
 package org.enigma.tokonyadia_api.constant;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
+@Getter
 public enum OrderStatus {
     DRAFT("Draft"),
     PENDING("Pending"),
@@ -9,13 +14,9 @@ public enum OrderStatus {
 
     private final String description;
 
-    OrderStatus(String description) {
-        this.description = description;
-    }
-
-    public static OrderStatus findByDescription(String description) {
+    public static OrderStatus findByDesc(String desc) {
         for (OrderStatus value : values()) {
-            if (value.description.equalsIgnoreCase(description)) {
+            if (value.getDescription().equalsIgnoreCase(desc)) {
                 return value;
             }
         }

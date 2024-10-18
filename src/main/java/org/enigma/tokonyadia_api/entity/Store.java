@@ -20,6 +20,10 @@ public class Store extends Auditable<String> {
     @Column(name = "name", nullable = false, length = 150)
     private String name;
 
+    @OneToOne
+    @JoinColumn(name = "person_id", nullable = false, updatable = false)
+    private Person person;
+
     @Column(name = "siup", unique = true, nullable = false, length = 150)
     private String siup;
 
@@ -28,8 +32,4 @@ public class Store extends Auditable<String> {
 
     @Column(name = "address", nullable = false)
     private String address;
-
-    @OneToOne
-    @JoinColumn(name = "person_id")
-    private Person person;
 }

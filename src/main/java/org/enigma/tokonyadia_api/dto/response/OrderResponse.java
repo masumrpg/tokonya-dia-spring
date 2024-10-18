@@ -15,5 +15,6 @@ public class OrderResponse {
     private String personName;
     private String personPhoneNumber;
     private String orderDate;
+    private String orderStatus;
     private List<OrderDetailResponse> orderDetails;
 }

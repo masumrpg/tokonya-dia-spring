@@ -49,6 +49,7 @@ public class MapperUtil {
         return StoreResponse.builder()
                 .id(store.getId())
                 .name(store.getName())
+                .personId(store.getPerson().getId())
                 .siup(store.getSiup())
                 .address(store.getAddress())
                 .phoneNumber(store.getPhoneNumber())
@@ -86,6 +87,7 @@ public class MapperUtil {
                 .personPhoneNumber(order.getPerson().getPhoneNumber())
                 .orderDate(order.getOrderDate().toString())
                 .orderDetails(orderDetailResponses)
+                .orderStatus(String.valueOf(order.getOrderStatus()))
                 .build();
     }
 

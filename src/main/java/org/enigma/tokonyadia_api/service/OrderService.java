@@ -3,6 +3,7 @@ package org.enigma.tokonyadia_api.service;
 import org.enigma.tokonyadia_api.dto.request.OrderDetailRequest;
 import org.enigma.tokonyadia_api.dto.request.SearchCommonRequest;
 import org.enigma.tokonyadia_api.dto.request.OrderRequest;
+import org.enigma.tokonyadia_api.dto.request.UpdateOrderStatusRequest;
 import org.enigma.tokonyadia_api.dto.response.OrderDetailResponse;
 import org.enigma.tokonyadia_api.dto.response.OrderResponse;
 import org.enigma.tokonyadia_api.entity.Order;
@@ -19,11 +20,16 @@ public interface OrderService {
 
     OrderResponse decreaseOrderDetailByOrderId(String orderId, OrderDetailRequest request);
 
-    OrderResponse removeOrderDetailByOrderId(String orderId, String orderDetailId);
+    OrderResponse removeOrderDetail(String orderId, String detailId);
+
+    OrderResponse checkoutOrder(String orderId);
+
+    OrderResponse updateOrderStatus(String orderId, UpdateOrderStatusRequest request);
 
     Order getOne(String id);
 
     List<OrderDetailResponse> getAllDetailByOrderId(String orderId);
 
     Page<OrderResponse> getAll(SearchCommonRequest request);
+
 }
