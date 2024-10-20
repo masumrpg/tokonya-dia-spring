@@ -8,5 +8,6 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class MidtransNotificationRequest {
+    //    @NotBlank(message = "Order id is required")
     private String orderId;
 }
