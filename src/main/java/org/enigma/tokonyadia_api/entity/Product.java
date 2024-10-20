@@ -22,8 +22,8 @@ public class Product extends Auditable<String> {
     @Column(name = "name", nullable = false, length = 150)
     private String name;
 
-    @Column(name = "img_url")
-    private String imgUrl;
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<ProductImage> productImages;
 
     @Column(name = "description", nullable = false)
     private String description;

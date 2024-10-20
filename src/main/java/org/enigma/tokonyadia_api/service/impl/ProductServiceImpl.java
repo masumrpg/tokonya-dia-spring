@@ -7,9 +7,11 @@ import org.enigma.tokonyadia_api.dto.request.UpdateProductRequest;
 import org.enigma.tokonyadia_api.dto.response.ProductResponse;
 import org.enigma.tokonyadia_api.entity.Product;
 import org.enigma.tokonyadia_api.entity.ProductCategory;
+import org.enigma.tokonyadia_api.entity.ProductImage;
 import org.enigma.tokonyadia_api.entity.Store;
 import org.enigma.tokonyadia_api.repository.ProductRepository;
 import org.enigma.tokonyadia_api.service.ProductCategoryService;
+import org.enigma.tokonyadia_api.service.ProductImageService;
 import org.enigma.tokonyadia_api.service.ProductService;
 import org.enigma.tokonyadia_api.service.StoreService;
 import org.enigma.tokonyadia_api.specification.FilterSpecificationBuilder;
@@ -24,8 +26,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.enigma.tokonyadia_api.util.MapperUtil.toProductResponse;
@@ -35,12 +39,13 @@ import static org.enigma.tokonyadia_api.util.MapperUtil.toProductResponse;
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final ProductCategoryService productCategoryService;
+    private final ProductImageService productImageService;
     private final StoreService storeService;
     private final ValidationUtil validationUtil;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public ProductResponse create(ProductRequest request) {
+    public ProductResponse create(List<MultipartFile> multipartFiles, ProductRequest request) {
         validationUtil.validate(request);
         Store store = storeService.getOneById(request.getStoreId());
         ProductCategory productCategory = productCategoryService.getOne(request.getCategoryId());
@@ -53,7 +58,10 @@ public class ProductServiceImpl implements ProductService {
                 .store(store)
                 .build();
         productRepository.saveAndFlush(product);
-
+        if (multipartFiles != null && !multipartFiles.isEmpty()) {
+            List<ProductImage> menuImages = productImageService.createBulk(multipartFiles, product);
+            product.setProductImages(menuImages);
+        }
         return toProductResponse(product);
     }
 

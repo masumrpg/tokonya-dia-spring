@@ -27,7 +27,7 @@ import java.util.Arrays;
 @RequestMapping(path = Constant.AUTH_API)
 @RequiredArgsConstructor
 public class AuthController {
-    @Value("${warung.makan.bahari.refresh-token-expiration-in-hour}")
+    @Value("${tokonya.dia.refresh-token-expiration-in-hour}")
     private Integer REFRESH_TOKEN_EXPIRY;
 
     private final AuthService authService;

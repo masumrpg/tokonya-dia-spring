@@ -1,5 +1,6 @@
 package org.enigma.tokonyadia_api.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.enigma.tokonyadia_api.constant.Constant;
 import org.enigma.tokonyadia_api.dto.request.ProductRequest;
@@ -10,19 +11,32 @@ import org.enigma.tokonyadia_api.service.ProductService;
 import org.enigma.tokonyadia_api.util.ResponseUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(Constant.PRODUCT_API)
 @RequiredArgsConstructor
 public class ProductController {
     private final ProductService productServiceImpl;
+    private final ObjectMapper objectMapper;
 
-    @PostMapping
-    public ResponseEntity<?> createProduct(@RequestBody ProductRequest product) {
-        ProductResponse productResponse = productServiceImpl.create(product);
-        return ResponseUtil.buildCommonResponse(HttpStatus.CREATED, Constant.SUCCESS_CREATED_PRODUCT, productResponse);
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> createProduct(
+            @RequestParam(name = "images", required = false) List<MultipartFile> multipartFiles,
+            @RequestPart(name = "menu") String product
+    ) {
+        try {
+            ProductRequest productRequest = objectMapper.readValue(product, ProductRequest.class);
+            ProductResponse productResponse = productServiceImpl.create(multipartFiles, productRequest);
+            return ResponseUtil.buildCommonResponse(HttpStatus.CREATED, Constant.SUCCESS_CREATED_PRODUCT, productResponse);
+        } catch (Exception e) {
+            return ResponseUtil.buildCommonResponse(HttpStatus.BAD_REQUEST, e.getMessage(), null);
+        }
     }
 
     @GetMapping(path = "/{productId}")

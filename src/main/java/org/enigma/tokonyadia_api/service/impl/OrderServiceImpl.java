@@ -45,7 +45,6 @@ import static org.enigma.tokonyadia_api.util.MapperUtil.*;
 public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final PersonService personService;
-    private final OrderDetailService orderDetailService;
     private final ProductService productService;
     private final ValidationUtil validationUtil;
 
@@ -159,16 +158,11 @@ public class OrderServiceImpl implements OrderService {
         if (order.getOrderStatus() != OrderStatus.DRAFT) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Constant.ERROR_REMOVE_ITEMS_FROM_NON_DRAFT);
         }
+        log.error(order.getOrderDetails().get(0).getId());
+        order.getOrderDetails().removeIf(orderDetail -> orderDetail.getId().equals(detailId));
 
-        OrderDetail detailToRemove = order.getOrderDetails().stream()
-                .filter(detail -> detail.getId().equals(detailId))
-                .findFirst()
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order detail not found"));
-
-        order.getOrderDetails().remove(detailToRemove);
-
-        Order updatedOrder = orderRepository.save(order);
-        return MapperUtil.toOrderResponse(updatedOrder);
+        Order saved = orderRepository.saveAndFlush(order);
+        return MapperUtil.toOrderResponse(saved);
     }
 
 

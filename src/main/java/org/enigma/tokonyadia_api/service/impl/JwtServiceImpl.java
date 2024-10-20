@@ -30,13 +30,13 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class JwtServiceImpl implements JwtService {
 
-    @Value("${warung.makan.bahari.jwt-secret}")
+    @Value("${tokonya.dia.jwt-secret}")
     private String SECRET_KEY;
 
-    @Value("${warung.makan.bahari.jwt-expiration-in-minutes-access-token}")
+    @Value("${tokonya.dia.jwt-expiration-in-minutes-access-token}")
     private Long EXPIRATION_IN_MINUTES_ACCESS_TOKEN;
 
-    @Value("${warung.makan.bahari.jwt-issuer}")
+    @Value("${tokonya.dia.jwt-issuer}")
     private String ISSUER;
 
     private final String BLACKLISTED = "BLACKLISTED";

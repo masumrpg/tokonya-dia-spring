@@ -2,6 +2,7 @@ package org.enigma.tokonyadia_api.controller;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.enigma.tokonyadia_api.constant.Constant;
 import org.enigma.tokonyadia_api.dto.request.OrderDetailRequest;
 import org.enigma.tokonyadia_api.dto.request.SearchCommonRequest;
@@ -21,6 +22,7 @@ import java.util.List;
 @RequestMapping(Constant.ORDER_API)
 @RequiredArgsConstructor
 @SecurityRequirement(name = "Bearer Authentication")
+@Slf4j
 public class OrderController {
     private final OrderService orderService;
 
@@ -50,6 +52,8 @@ public class OrderController {
 
     @DeleteMapping("/{orderId}/details/{orderDetailId}")
     public ResponseEntity<?> removeOrderDetailById(@PathVariable String orderId, @PathVariable String orderDetailId) {
+        log.error(orderId);
+        log.error(orderDetailId);
         OrderResponse orderResponse = orderService.removeOrderDetail(orderId, orderDetailId);
         return ResponseUtil.buildCommonResponse(HttpStatus.OK, "Successfully remove detail order", orderResponse);
     }

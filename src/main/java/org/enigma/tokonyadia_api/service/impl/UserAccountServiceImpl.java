@@ -9,7 +9,6 @@ import org.enigma.tokonyadia_api.dto.request.UserUpdatePasswordRequest;
 import org.enigma.tokonyadia_api.dto.response.UserResponse;
 import org.enigma.tokonyadia_api.entity.UserAccount;
 import org.enigma.tokonyadia_api.repository.UserAccountRepository;
-import org.enigma.tokonyadia_api.service.AuthService;
 import org.enigma.tokonyadia_api.service.UserAccountService;
 import org.enigma.tokonyadia_api.util.MapperUtil;
 import org.enigma.tokonyadia_api.util.ValidationUtil;
@@ -36,10 +35,10 @@ public class UserAccountServiceImpl implements UserAccountService {
 
     // =================== INIT ADMIN ACCOUNT ===========================
 
-    @Value("${warung.makan.bahari.user-admin}")
+    @Value("${tokonya.dia.user-admin}")
     private String USERNAME_ADMIN;
 
-    @Value("${warung.makan.bahari.user-password}")
+    @Value("${tokonya.dia.user-password}")
     private String PASSWORD_ADMIN;
 
 
@@ -129,7 +128,6 @@ public class UserAccountServiceImpl implements UserAccountService {
         userAccountRepository.save(userAccount);
     }
 
-    // TODO add ref link to reactive
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         boolean existsByUsernameAndIsDeletedTrue = userAccountRepository.existsByUsernameAndIsDeletedTrue(username);

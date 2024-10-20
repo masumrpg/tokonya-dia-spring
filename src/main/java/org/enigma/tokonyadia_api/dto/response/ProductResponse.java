@@ -12,11 +12,11 @@ import java.util.List;
 public class ProductResponse {
     private String id;
     private String name;
-    private String imageUrl;
     private String category;
     private String description;
     private Long price;
     private Integer stock;
     private String storeId;
+    private List<FileResponse> images;
     private List<ProductPromoResponse> productPromoId;
 }

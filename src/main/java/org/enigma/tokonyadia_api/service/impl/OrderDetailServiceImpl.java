@@ -8,8 +8,6 @@ import org.enigma.tokonyadia_api.util.ValidationUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class OrderDetailServiceImpl implements OrderDetailService {
@@ -31,13 +29,9 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         return orderDetail;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
-    public OrderDetail getById(String id) {
-        return null;
-    }
-
-    @Override
-    public List<OrderDetail> getAll() {
-        return List.of();
+    public void delete(OrderDetail request) {
+        orderDetailRepository.delete(request);
     }
 }

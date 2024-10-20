@@ -24,7 +24,6 @@ public class MapperUtil {
     }
 
     public static ProductResponse toProductResponse(Product product) {
-        Optional<Store> storeOpt = Optional.ofNullable(product.getStore());
         Optional<List<ProductPromo>> productPromoOpts = Optional.ofNullable(product.getProductPromo());
         List<ProductPromoResponse> promoResponses = productPromoOpts
                 .orElse(Collections.emptyList())
@@ -35,12 +34,12 @@ public class MapperUtil {
         return ProductResponse.builder()
                 .id(product.getId())
                 .name(product.getName())
-                .imageUrl(product.getImgUrl())
                 .category(product.getCategory().getName())
                 .description(product.getDescription())
                 .price(product.getPrice())
                 .stock(product.getStock())
-                .storeId(storeOpt.map(Store::getId).orElse(null))
+                .storeId(product.getStore().getId())
+                .images(product.getProductImages() != null ? product.getProductImages().stream().map(MapperUtil::toProductImageResponse).toList() : new ArrayList<>())
                 .productPromoId(promoResponses)
                 .build();
     }
@@ -145,6 +144,13 @@ public class MapperUtil {
                 .personId(productRating.getPerson().getId())
                 .rating(productRating.getRating())
                 .review(productRating.getReview())
+                .build();
+    }
+
+    public static FileResponse toProductImageResponse(ProductImage productImage) {
+        return FileResponse.builder()
+                .id(productImage.getId())
+                .url("/api/images/" + productImage.getId())
                 .build();
     }
 }

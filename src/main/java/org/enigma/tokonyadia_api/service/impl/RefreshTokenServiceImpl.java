@@ -3,7 +3,6 @@ package org.enigma.tokonyadia_api.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.enigma.tokonyadia_api.service.RedisService;
 import org.enigma.tokonyadia_api.service.RefreshTokenService;
-import org.enigma.tokonyadia_api.util.ValidationUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,7 +13,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class RefreshTokenServiceImpl implements RefreshTokenService {
-    @Value("${warung.makan.bahari.refresh-token-expiration-in-hour}")
+    @Value("${tokonya.dia.refresh-token-expiration-in-hour}")
     private Integer REFRESH_TOKEN_EXPIRY;
 
     private final RedisService redisService;

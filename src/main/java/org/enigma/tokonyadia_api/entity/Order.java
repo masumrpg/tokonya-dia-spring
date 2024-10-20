@@ -2,7 +2,6 @@ package org.enigma.tokonyadia_api.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.enigma.tokonyadia_api.audit.Auditable;
 import org.enigma.tokonyadia_api.constant.Constant;
 import org.enigma.tokonyadia_api.constant.OrderStatus;
 
@@ -16,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @Table(name = Constant.ORDER_TABLE)
 @Builder
-public class Order extends Auditable<String> {
+public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
@@ -25,7 +24,8 @@ public class Order extends Auditable<String> {
     @JoinColumn(name = "person_id", nullable = false)
     private Person person;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    // FIXME bug orphan delete error
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderDetail> orderDetails;
 
     @Column(name = "order_date", nullable = false)
@@ -40,7 +40,7 @@ public class Order extends Auditable<String> {
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
 
-    @OneToMany(mappedBy = "order", orphanRemoval = true)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Shipment> shipment;
 
     @PrePersist
