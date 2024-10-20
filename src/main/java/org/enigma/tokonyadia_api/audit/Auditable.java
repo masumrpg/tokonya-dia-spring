@@ -12,6 +12,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
+
+// TODO add auditing in response
 @Getter
 @Setter
 @MappedSuperclass

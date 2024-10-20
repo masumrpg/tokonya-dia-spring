@@ -12,7 +12,7 @@ public interface ProductRatingService {
 
     ProductRatingResponse getById(String id);
 
-    ProductRating getOneById(String id);
+    ProductRating getOne(String id);
 
     ProductRatingResponse update(String id, UpdateProductRatingRequest request);
 

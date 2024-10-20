@@ -5,6 +5,8 @@ import lombok.*;
 import org.enigma.tokonyadia_api.audit.Auditable;
 import org.enigma.tokonyadia_api.constant.Constant;
 
+import java.util.List;
+
 @Entity
 @Setter
 @Getter
@@ -32,4 +34,7 @@ public class Store extends Auditable<String> {
 
     @Column(name = "address", nullable = false)
     private String address;
+
+    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Product> product;
 }

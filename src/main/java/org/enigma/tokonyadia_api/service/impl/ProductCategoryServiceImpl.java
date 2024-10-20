@@ -22,8 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Optional;
-
 import static org.enigma.tokonyadia_api.util.MapperUtil.toProductCategoryResponse;
 
 @Service
@@ -53,8 +51,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public ProductCategory getOne(String id) {
-        Optional<ProductCategory> optionalProductCategory = productCategoryRepository.findById(id);
-        return optionalProductCategory.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, Constant.PRODUCT_CATEGORY_NOT_FOUND));
+        return productCategoryRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, Constant.PRODUCT_CATEGORY_NOT_FOUND));
     }
 
     @Transactional(rollbackFor = Exception.class)

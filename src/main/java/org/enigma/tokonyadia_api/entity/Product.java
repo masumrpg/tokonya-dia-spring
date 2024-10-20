@@ -42,9 +42,6 @@ public class Product extends Auditable<String> {
     @JoinColumn(name = "category_id")
     private ProductCategory category;
 
-    @OneToMany(mappedBy = "product", orphanRemoval = true)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductRating> productRating;
-
-    @OneToMany(mappedBy = "product", orphanRemoval = true)
-    private List<ProductPromo> productPromo;
 }

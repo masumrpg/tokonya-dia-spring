@@ -1,13 +1,16 @@
 package org.enigma.tokonyadia_api.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.enigma.tokonyadia_api.constant.Constant;
 import org.enigma.tokonyadia_api.dto.request.OrderDetailRequest;
 import org.enigma.tokonyadia_api.dto.request.SearchCommonRequest;
 import org.enigma.tokonyadia_api.dto.request.OrderRequest;
-import org.enigma.tokonyadia_api.dto.response.OrderDetailResponse;
+import org.enigma.tokonyadia_api.dto.response.ProductDetailResponse;
 import org.enigma.tokonyadia_api.dto.response.OrderResponse;
 import org.enigma.tokonyadia_api.service.OrderService;
 import org.enigma.tokonyadia_api.util.ResponseUtil;
@@ -22,61 +25,142 @@ import java.util.List;
 @RequestMapping(Constant.ORDER_API)
 @RequiredArgsConstructor
 @SecurityRequirement(name = "Bearer Authentication")
+@Tag(name = "Order Management", description = "APIs for managing orders")
 @Slf4j
 public class OrderController {
     private final OrderService orderService;
 
+    /**
+     * Create a new draft order.
+     *
+     * @param request the order request
+     * @return the response entity with created order details
+     */
+    @Operation(summary = "Create Order Draft", description = "Create a new draft order")
     @PostMapping(path = "/draft")
     public ResponseEntity<?> createDraft(@RequestBody OrderRequest request) {
         OrderResponse orderResponse = orderService.create(request);
         return ResponseUtil.buildCommonResponse(HttpStatus.CREATED, Constant.SUCCESS_CREATED_ORDER, orderResponse);
     }
 
+    /**
+     * Retrieve an order by its ID.
+     *
+     * @param orderId the ID of the order to retrieve
+     * @return the response entity with order details
+     */
+    @Operation(summary = "Get Order by ID", description = "Retrieve an order by its ID")
     @GetMapping("/{orderId}")
-    public ResponseEntity<?> getOrderById(@PathVariable String orderId) {
-        OrderResponse oderResponse = orderService.getByOrderId(orderId);
-        return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_GET_ORDER, oderResponse);
+    public ResponseEntity<?> getOrderById(@Parameter(description = "ID of the order to retrieve") @PathVariable String orderId) {
+        OrderResponse orderResponse = orderService.getByOrderId(orderId);
+        return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_GET_ORDER, orderResponse);
     }
 
+    /**
+     * Add details to an existing order.
+     *
+     * @param orderId the ID of the order to which details will be added
+     * @param request the order detail request
+     * @return the response entity with updated order details
+     */
+    @Operation(summary = "Add Order Details", description = "Add details to an existing order")
     @PostMapping("/{orderId}/details/add")
-    public ResponseEntity<?> addOrderDetailsById(@PathVariable String orderId, @RequestBody OrderDetailRequest request) {
+    public ResponseEntity<?> addOrderDetailsById(
+            @Parameter(description = "ID of the order to which details will be added") @PathVariable String orderId,
+            @RequestBody OrderDetailRequest request) {
         OrderResponse orderDetailResponseList = orderService.addOrderDetailByOrderId(orderId, request);
         return ResponseUtil.buildCommonResponse(HttpStatus.CREATED, Constant.SUCCESS_CREATE_ORDER_DETAIL, orderDetailResponseList);
     }
 
+    /**
+     * Decrease details in an existing order.
+     *
+     * @param orderId the ID of the order to decrease details from
+     * @param request the order detail request
+     * @return the response entity with updated order details
+     */
+    @Operation(summary = "Decrease Order Details", description = "Decrease details in an existing order")
     @PostMapping("/{orderId}/details/decrease")
-    public ResponseEntity<?> decreaseOrderById(@PathVariable String orderId, @RequestBody OrderDetailRequest request) {
+    public ResponseEntity<?> decreaseOrderById(
+            @Parameter(description = "ID of the order to decrease details from") @PathVariable String orderId,
+            @RequestBody OrderDetailRequest request) {
         OrderResponse orderDetailResponses = orderService.decreaseOrderDetailByOrderId(orderId, request);
         return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_DECREASE_ORDER_DETAIL, orderDetailResponses);
     }
 
+    /**
+     * Remove a specific detail from an order.
+     *
+     * @param orderId       the ID of the order
+     * @param orderDetailId the ID of the order detail to remove
+     * @return the response entity with updated order details
+     */
+    @Operation(summary = "Remove Order Detail", description = "Remove a specific detail from an order")
     @DeleteMapping("/{orderId}/details/{orderDetailId}")
-    public ResponseEntity<?> removeOrderDetailById(@PathVariable String orderId, @PathVariable String orderDetailId) {
+    public ResponseEntity<?> removeOrderDetailById(
+            @Parameter(description = "ID of the order") @PathVariable String orderId,
+            @Parameter(description = "ID of the order detail to remove") @PathVariable String orderDetailId) {
         log.error(orderId);
         log.error(orderDetailId);
         OrderResponse orderResponse = orderService.removeOrderDetail(orderId, orderDetailId);
-        return ResponseUtil.buildCommonResponse(HttpStatus.OK, "Successfully remove detail order", orderResponse);
+        return ResponseUtil.buildCommonResponse(HttpStatus.OK, "Successfully removed order detail", orderResponse);
     }
 
+    /**
+     * Checkout an existing order.
+     *
+     * @param orderId the ID of the order to checkout
+     * @return the response entity with order checkout details
+     */
+    @Operation(summary = "Checkout Order", description = "Checkout an existing order")
     @PostMapping("/{orderId}/checkout")
-    public ResponseEntity<?> checkoutOrder(@PathVariable String orderId) {
+    public ResponseEntity<?> checkoutOrder(@Parameter(description = "ID of the order to checkout") @PathVariable String orderId) {
         OrderResponse orderResponse = orderService.checkoutOrder(orderId);
         return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_CHECKOUT_ORDER, orderResponse);
     }
 
-    @GetMapping("/{orderId}/details")
-    public ResponseEntity<?> getAllOrderDetailsById(@PathVariable String orderId) {
-        List<OrderDetailResponse> orderDetailResponseList = orderService.getAllDetailByOrderId(orderId);
-        return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_GET_ORDER_DETAIL, orderDetailResponseList);
+    /**
+     * Cancel an existing order.
+     *
+     * @param orderId the ID of the order to cancel
+     * @return the response entity with order cancellation details
+     */
+    @Operation(summary = "Cancel Order", description = "Cancel an existing order")
+    @PostMapping("/{orderId}/cancel")
+    public ResponseEntity<?> cancelOrder(@Parameter(description = "ID of the order to cancel") @PathVariable String orderId) {
+        OrderResponse orderResponse = orderService.cancelOrder(orderId);
+        return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_CHECKOUT_ORDER, orderResponse);
     }
 
+    /**
+     * Retrieve all details for a specific order.
+     *
+     * @param orderId the ID of the order to get details for
+     * @return the response entity with list of order details
+     */
+    @Operation(summary = "Get All Order Details", description = "Retrieve all details for a specific order")
+    @GetMapping("/{orderId}/details")
+    public ResponseEntity<?> getAllOrderDetailsById(@Parameter(description = "ID of the order to get details for") @PathVariable String orderId) {
+        List<ProductDetailResponse> productDetailResponseList = orderService.getAllDetailByOrderId(orderId);
+        return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_GET_ORDER_DETAIL, productDetailResponseList);
+    }
+
+    /**
+     * Retrieve all orders with pagination and filtering.
+     *
+     * @param page  the page number to retrieve
+     * @param size  the number of orders per page
+     * @param sort  the sorting criteria
+     * @param query the search query
+     * @return the response entity with list of orders
+     */
+    @Operation(summary = "Get All Orders", description = "Retrieve all orders with pagination and filtering")
     @GetMapping
     public ResponseEntity<?> getAllOrders(
             @RequestParam(name = "page", required = false, defaultValue = "1") Integer page,
             @RequestParam(name = "size", required = false, defaultValue = "10") Integer size,
             @RequestParam(name = "sort", required = false) String sort,
-            @RequestParam(name = "q", required = false) String query
-    ) {
+            @RequestParam(name = "q", required = false) String query) {
         SearchCommonRequest searchCommonRequest = SearchCommonRequest.builder()
                 .page(page)
                 .size(size)

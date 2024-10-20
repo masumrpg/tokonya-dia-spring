@@ -20,6 +20,9 @@ public class OrderDetail {
     @JoinColumn(name = "order_id")
     private Order order;
 
+    @OneToOne(mappedBy = "orderDetail", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Shipment shipment;
+
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;

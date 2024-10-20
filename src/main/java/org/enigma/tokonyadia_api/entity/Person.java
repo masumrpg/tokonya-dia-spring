@@ -23,9 +23,6 @@ public class Person extends Auditable<String> {
     @Column(name = "name", nullable = false, length = 150)
     private String name;
 
-    @Column(name = "img_url")
-    private String imgUrl;
-
     @Column(name = "gender", nullable = false)
     @Enumerated(EnumType.STRING)
     private Gender gender;

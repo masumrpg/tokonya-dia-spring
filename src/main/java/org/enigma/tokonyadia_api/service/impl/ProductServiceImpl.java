@@ -30,7 +30,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.enigma.tokonyadia_api.util.MapperUtil.toProductResponse;
 
@@ -47,7 +46,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponse create(List<MultipartFile> multipartFiles, ProductRequest request) {
         validationUtil.validate(request);
-        Store store = storeService.getOneById(request.getStoreId());
+        Store store = storeService.getOne(request.getStoreId());
         ProductCategory productCategory = productCategoryService.getOne(request.getCategoryId());
         Product product = Product.builder()
                 .name(request.getName())
@@ -67,30 +66,25 @@ public class ProductServiceImpl implements ProductService {
 
     @Transactional(readOnly = true)
     @Override
-    public Product getOneById(String id) {
-        Optional<Product> byId = productRepository.findById(id);
-        if (byId.isPresent()) {
-            return byId.get();
-        }
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found");
+    public Product getOne(String id) {
+        return productRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
     }
 
     @Transactional(readOnly = true)
     @Override
     public ProductResponse getById(String id) {
-        return toProductResponse(getOneById(id));
+        return toProductResponse(getOne(id));
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
     public ProductResponse update(String id, UpdateProductRequest request) {
         validationUtil.validate(request);
-        Store store = storeService.getOneById(request.getStoreId());
+        Store store = storeService.getOne(request.getStoreId());
         ProductCategory productCategory = productCategoryService.getOne(request.getCategoryId());
 
-        Product existingProduct = getOneById(id);
+        Product existingProduct = getOne(id);
         existingProduct.setName(request.getName());
-        existingProduct.setName(request.getImgUrl());
         existingProduct.setCategory(productCategory);
         existingProduct.setDescription(request.getDescription());
         existingProduct.setPrice(request.getPrice());
@@ -102,7 +96,7 @@ public class ProductServiceImpl implements ProductService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void delete(String id) {
-        productRepository.delete(getOneById(id));
+        productRepository.delete(getOne(id));
     }
 
     @Transactional(readOnly = true)

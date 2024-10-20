@@ -12,7 +12,7 @@ public interface PersonService {
 
     Person create(Person person);
 
-    Person getOneById(String id);
+    Person getOne(String id);
 
     PersonResponse getById(String id);
 

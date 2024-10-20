@@ -10,6 +10,6 @@ import org.enigma.tokonyadia_api.constant.OrderStatus;
 @AllArgsConstructor
 @Builder
 public class UpdateOrderStatusRequest {
-    @NotNull(message = "status is required")
+    @NotNull(message = "Status is required")
     private OrderStatus status;
 }

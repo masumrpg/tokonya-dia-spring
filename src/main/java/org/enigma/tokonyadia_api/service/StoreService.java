@@ -9,7 +9,7 @@ import org.springframework.data.domain.Page;
 public interface StoreService {
     StoreResponse create(StoreRequest request);
 
-    Store getOneById(String id);
+    Store getOne(String id);
 
     StoreResponse getById(String id);
 

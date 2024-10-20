@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.enigma.tokonyadia_api.constant.Constant;
 import org.enigma.tokonyadia_api.constant.Gender;
 import org.enigma.tokonyadia_api.constant.UserRole;
-import org.enigma.tokonyadia_api.dto.request.UpdatePersonRequest;
 import org.enigma.tokonyadia_api.dto.request.RegisterCreateRequest;
 import org.enigma.tokonyadia_api.dto.request.SearchCommonRequest;
+import org.enigma.tokonyadia_api.dto.request.UpdatePersonRequest;
 import org.enigma.tokonyadia_api.dto.response.PersonResponse;
 import org.enigma.tokonyadia_api.entity.Person;
 import org.enigma.tokonyadia_api.entity.UserAccount;
@@ -27,9 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Optional;
-
-import static org.enigma.tokonyadia_api.util.MapperUtil.*;
+import static org.enigma.tokonyadia_api.util.MapperUtil.toPersonResponse;
 
 @Service
 @RequiredArgsConstructor
@@ -57,6 +55,7 @@ public class PersonServiceImpl implements PersonService {
                 .gender(Gender.findByDescription(request.getGender()))
                 .email(request.getEmail())
                 .phoneNumber(request.getPhoneNumber())
+                .address(request.getAddress())
                 .userAccount(userAccount)
                 .build();
         personRepository.saveAndFlush(person);
@@ -73,27 +72,22 @@ public class PersonServiceImpl implements PersonService {
 
     @Transactional(readOnly = true)
     @Override
-    public Person getOneById(String id) {
-        Optional<Person> byId = personRepository.findById(id);
-        if (byId.isPresent()) {
-            return byId.get();
-        }
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, Constant.ERROR_PERSON_NOT_FOUND);
+    public Person getOne(String id) {
+        return personRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, Constant.ERROR_PERSON_NOT_FOUND));
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
     public PersonResponse getById(String id) {
-        return toPersonResponse(getOneById(id));
+        return toPersonResponse(getOne(id));
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
     public PersonResponse update(String id, UpdatePersonRequest request) {
         validationUtil.validate(request);
-        Person person = getOneById(id);
+        Person person = getOne(id);
         person.setName(request.getName());
-        person.setImgUrl(request.getImgUrl());
         person.setGender(Gender.findByDescription(request.getGender()));
         person.setEmail(request.getEmail());
         person.setPhoneNumber(request.getPhoneNumber());
@@ -105,7 +99,7 @@ public class PersonServiceImpl implements PersonService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void delete(String id) {
-        Person person = getOneById(id);
+        Person person = getOne(id);
         personRepository.delete(person);
     }
 

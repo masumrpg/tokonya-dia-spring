@@ -25,8 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 public class ProductRatingServiceImpl implements ProductRatingService {
@@ -40,8 +38,8 @@ public class ProductRatingServiceImpl implements ProductRatingService {
     public ProductRatingResponse create(ProductRatingRequest request) {
         validationUtil.validate(request);
         ProductRating productRating = ProductRating.builder()
-                .product(productService.getOneById(request.getProductId()))
-                .person(personService.getOneById(request.getPersonId()))
+                .product(productService.getOne(request.getProductId()))
+                .person(personService.getOne(request.getPersonId()))
                 .rating(request.getRating())
                 .review(request.getReview())
                 .build();
@@ -52,21 +50,20 @@ public class ProductRatingServiceImpl implements ProductRatingService {
     @Transactional(readOnly = true)
     @Override
     public ProductRatingResponse getById(String id) {
-        return MapperUtil.toProductRatingResponse(getOneById(id));
+        return MapperUtil.toProductRatingResponse(getOne(id));
     }
 
     @Transactional(readOnly = true)
     @Override
-    public ProductRating getOneById(String id) {
-        Optional<ProductRating> optionalProductRating = productRatingRepository.findById(id);
-        return optionalProductRating.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, Constant.PRODUCT_RATING_NOT_FOUND));
+    public ProductRating getOne(String id) {
+        return productRatingRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, Constant.PRODUCT_RATING_NOT_FOUND));
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
     public ProductRatingResponse update(String id, UpdateProductRatingRequest request) {
         validationUtil.validate(request);
-        ProductRating productRating = getOneById(id);
+        ProductRating productRating = getOne(id);
         productRating.setRating(request.getRating());
         productRating.setReview(request.getReview());
         productRatingRepository.save(productRating);
@@ -76,7 +73,7 @@ public class ProductRatingServiceImpl implements ProductRatingService {
     @Transactional(readOnly = true)
     @Override
     public void delete(String id) {
-        productRatingRepository.delete(getOneById(id));
+        productRatingRepository.delete(getOne(id));
     }
 
     @Transactional(readOnly = true)

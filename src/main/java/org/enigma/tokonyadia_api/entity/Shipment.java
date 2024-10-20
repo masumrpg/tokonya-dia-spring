@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.enigma.tokonyadia_api.audit.Auditable;
 import org.enigma.tokonyadia_api.constant.Constant;
-import org.enigma.tokonyadia_api.constant.Courier;
-import org.enigma.tokonyadia_api.constant.ShipmentStatus;
 
 import java.time.LocalDateTime;
 
@@ -21,15 +19,9 @@ public class Shipment extends Auditable<String> {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @ManyToOne
-    @JoinColumn(name = "order_id")
-    private Order order;
-
-    @Column(name = "courier_name", nullable = false)
-    private Courier courierName;
-
-    @Column(name = "receipt", nullable = false) // no resi
-    private String receipt;
+    @OneToOne
+    @JoinColumn(name = "order_detail_id", nullable = false)
+    private OrderDetail orderDetail;
 
     @Column(name = "delivery_date", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
@@ -40,12 +32,6 @@ public class Shipment extends Auditable<String> {
 
     @Column(name = "delivery_to", nullable = false)
     private String deliveryTo;
-
-    @Column(name = "estimate_date", nullable = false)
-    private LocalDateTime estimateDate;
-
-    @Column(name = "status", nullable = false)
-    private ShipmentStatus status;
 
     @PrePersist
     protected void onCreate() {

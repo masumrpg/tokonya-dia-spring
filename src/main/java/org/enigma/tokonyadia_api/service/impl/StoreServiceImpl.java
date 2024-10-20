@@ -24,8 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Optional;
-
 import static org.enigma.tokonyadia_api.util.MapperUtil.toStoreResponse;
 
 
@@ -40,7 +38,7 @@ public class StoreServiceImpl implements StoreService {
     @Override
     public StoreResponse create(StoreRequest request) {
         validationUtil.validate(request);
-        Person person = personService.getOneById(request.getPersonId());
+        Person person = personService.getOne(request.getPersonId());
         Store store = Store.builder()
                 .name(request.getName())
                 .person(person)
@@ -55,14 +53,14 @@ public class StoreServiceImpl implements StoreService {
     @Transactional(readOnly = true)
     @Override
     public StoreResponse getById(String id) {
-        return toStoreResponse(getOneById(id));
+        return toStoreResponse(getOne(id));
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
     public StoreResponse update(String id, StoreRequest request) {
         validationUtil.validate(request);
-        Store store = getOneById(id);
+        Store store = getOne(id);
         store.setName(request.getName());
         store.setPhoneNumber(request.getPhoneNumber());
         store.setSiup(request.getSiup());
@@ -73,18 +71,14 @@ public class StoreServiceImpl implements StoreService {
 
     @Transactional(readOnly = true)
     @Override
-    public Store getOneById(String id) {
-        Optional<Store> byId = storeRepository.findById(id);
-        if (byId.isPresent()) {
-            return byId.get();
-        }
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, Constant.ERROR_STORE_NOT_FOUND);
+    public Store getOne(String id) {
+        return storeRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, Constant.ERROR_STORE_NOT_FOUND));
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void delete(String id) {
-        Store store = getOneById(id);
+        Store store = getOne(id);
         storeRepository.delete(store);
     }
 

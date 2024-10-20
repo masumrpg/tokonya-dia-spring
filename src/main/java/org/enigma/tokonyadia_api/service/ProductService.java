@@ -13,7 +13,7 @@ import java.util.List;
 public interface ProductService {
     ProductResponse create(List<MultipartFile> multipartFiles, ProductRequest request);
 
-    Product getOneById(String id);
+    Product getOne(String id);
 
     ProductResponse getById(String id);
 

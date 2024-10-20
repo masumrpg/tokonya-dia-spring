@@ -1,5 +1,6 @@
 package org.enigma.tokonyadia_api.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -20,35 +21,74 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(Constant.PERSON_API)
 @RequiredArgsConstructor
 @SecurityRequirement(name = "Bearer Authentication")
-@Tag(name = "Person Management")
+@Tag(name = "Person Management", description = "APIs for managing persons")
 public class PersonController {
     private final PersonService personService;
 
+    /**
+     * Create a new person.
+     *
+     * @param request the details of the person to create
+     * @return the created person response
+     */
+    @Operation(summary = "Create a new person", description = "Create a new person with the provided details")
     @PostMapping
     public ResponseEntity<?> createPerson(@RequestBody RegisterCreateRequest request) {
         PersonResponse personResponse = personService.create(request);
         return ResponseUtil.buildCommonResponse(HttpStatus.CREATED, Constant.SUCCESS_CREATED_PERSON, personResponse);
     }
 
+    /**
+     * Get person by ID.
+     *
+     * @param personId the ID of the person to retrieve
+     * @return the person response
+     */
+    @Operation(summary = "Get a person by ID", description = "Retrieve the details of a person by their ID")
     @GetMapping(path = "/{personId}")
     public ResponseEntity<?> getPersonById(@PathVariable String personId) {
         PersonResponse personResponse = personService.getById(personId);
         return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_GET_PERSON, personResponse);
     }
 
+    /**
+     * Update a person by ID.
+     *
+     * @param personId the ID of the person to update
+     * @param request  the updated details of the person
+     * @return the updated person response
+     */
     @PreAuthorize("hasRole('ADMIN') or ((hasRole('SELLER') or hasRole('CUSTOMER')) and @permissionEvaluationServiceImpl.hasAccessToCustomerAndSeller(#personId, authentication.principal.id))")
+    @Operation(summary = "Update a person", description = "Update the details of an existing person by their ID")
     @PutMapping("/{personId}")
     public ResponseEntity<?> updatePerson(@PathVariable String personId, @RequestBody UpdatePersonRequest request) {
         PersonResponse personResponse = personService.update(personId, request);
         return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_UPDATE_PERSON, personResponse);
     }
 
+    /**
+     * Delete a person by ID.
+     *
+     * @param personId the ID of the person to delete
+     * @return a response indicating the deletion status
+     */
+    @Operation(summary = "Delete a person", description = "Delete a person by their ID")
     @DeleteMapping("/{personId}")
     public ResponseEntity<?> deletePerson(@PathVariable String personId) {
         personService.delete(personId);
         return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_DELETE_PERSON, null);
     }
 
+    /**
+     * Get all persons with pagination and filtering options.
+     *
+     * @param page  the page number to retrieve (default is 1)
+     * @param size  the number of persons per page (default is 10)
+     * @param sort  the sorting criteria
+     * @param query the search query
+     * @return a paginated response of persons
+     */
+    @Operation(summary = "Get all persons", description = "Retrieve a paginated list of persons with optional filtering")
     @GetMapping
     public ResponseEntity<?> getAllPersons(
             @RequestParam(name = "page", required = false, defaultValue = "1") Integer page,

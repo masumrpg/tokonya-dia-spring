@@ -4,7 +4,7 @@ import org.enigma.tokonyadia_api.dto.request.OrderDetailRequest;
 import org.enigma.tokonyadia_api.dto.request.SearchCommonRequest;
 import org.enigma.tokonyadia_api.dto.request.OrderRequest;
 import org.enigma.tokonyadia_api.dto.request.UpdateOrderStatusRequest;
-import org.enigma.tokonyadia_api.dto.response.OrderDetailResponse;
+import org.enigma.tokonyadia_api.dto.response.ProductDetailResponse;
 import org.enigma.tokonyadia_api.dto.response.OrderResponse;
 import org.enigma.tokonyadia_api.entity.Order;
 import org.springframework.data.domain.Page;
@@ -24,11 +24,13 @@ public interface OrderService {
 
     OrderResponse checkoutOrder(String orderId);
 
-    OrderResponse updateOrderStatus(String orderId, UpdateOrderStatusRequest request);
+    OrderResponse cancelOrder(String orderId);
+
+    void updateOrderStatus(String orderId, UpdateOrderStatusRequest request);
 
     Order getOne(String id);
 
-    List<OrderDetailResponse> getAllDetailByOrderId(String orderId);
+    List<ProductDetailResponse> getAllDetailByOrderId(String orderId);
 
     Page<OrderResponse> getAll(SearchCommonRequest request);
 

@@ -8,15 +8,11 @@ import org.enigma.tokonyadia_api.dto.request.OrderDetailRequest;
 import org.enigma.tokonyadia_api.dto.request.SearchCommonRequest;
 import org.enigma.tokonyadia_api.dto.request.OrderRequest;
 import org.enigma.tokonyadia_api.dto.request.UpdateOrderStatusRequest;
-import org.enigma.tokonyadia_api.dto.response.OrderDetailResponse;
+import org.enigma.tokonyadia_api.dto.response.ProductDetailResponse;
 import org.enigma.tokonyadia_api.dto.response.OrderResponse;
-import org.enigma.tokonyadia_api.entity.Person;
-import org.enigma.tokonyadia_api.entity.Order;
-import org.enigma.tokonyadia_api.entity.OrderDetail;
-import org.enigma.tokonyadia_api.entity.Product;
+import org.enigma.tokonyadia_api.entity.*;
 import org.enigma.tokonyadia_api.repository.OrderRepository;
 import org.enigma.tokonyadia_api.service.PersonService;
-import org.enigma.tokonyadia_api.service.OrderDetailService;
 import org.enigma.tokonyadia_api.service.OrderService;
 import org.enigma.tokonyadia_api.service.ProductService;
 import org.enigma.tokonyadia_api.specification.FilterSpecificationBuilder;
@@ -33,9 +29,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.enigma.tokonyadia_api.util.MapperUtil.*;
 
@@ -53,7 +48,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderResponse create(OrderRequest request) {
         validationUtil.validate(request);
-        Person person = personService.getOneById(request.getPersonId());
+        Person person = personService.getOne(request.getPersonId());
 
         List<Order> orderList = orderRepository.findByPerson(person);
 
@@ -87,7 +82,7 @@ public class OrderServiceImpl implements OrderService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Constant.ERROR_ADD_ITEMS_TO_NON_DRAFT);
         }
 
-        Product product = productService.getOneById(request.getProductId());
+        Product product = productService.getOne(request.getProductId());
 
         Optional<OrderDetail> existingOrderDetail = order.getOrderDetails().stream()
                 .filter(orderDetail -> orderDetail.getProduct().getId().equals(product.getId()))
@@ -109,8 +104,8 @@ public class OrderServiceImpl implements OrderService {
             }
 
             OrderDetail newOrderDetail = OrderDetail.builder()
-                    .product(product)
                     .order(order)
+                    .product(product)
                     .quantity(1)
                     .price(product.getPrice())
                     .build();
@@ -127,30 +122,30 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderResponse decreaseOrderDetailByOrderId(String orderId, OrderDetailRequest request) {
         validationUtil.validate(request);
+
         Order order = getOne(orderId);
         if (order.getOrderStatus() != OrderStatus.DRAFT) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Constant.ERROR_ADD_ITEMS_TO_NON_DRAFT);
         }
 
-        Product product = productService.getOneById(request.getProductId());
+        Product product = productService.getOne(request.getProductId());
 
-        order.getOrderDetails().forEach(orderDetail -> {
-            if (orderDetail.getProduct().getId().equals(product.getId())) {
-                if (orderDetail.getQuantity() == 1) {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product can't decrease again");
-                } else {
-                    orderDetail.setQuantity(orderDetail.getQuantity() - 1);
-                    orderDetail.setPrice(product.getPrice());
-                }
-            } else {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order detail not found");
-            }
-        });
+        OrderDetail orderDetail = order.getOrderDetails().stream()
+                .filter(detail -> detail.getProduct().getId().equals(product.getId()))
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order detail not found"));
+
+        if (orderDetail.getQuantity() == 1) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product can't decrease again");
+        }
+
+        orderDetail.setQuantity(orderDetail.getQuantity() - 1);
+        orderDetail.setPrice(product.getPrice());
 
         return MapperUtil.toOrderResponse(order);
     }
 
-    // FIXME ga bisa di hapus yang di db
+
     @Transactional(rollbackFor = Exception.class)
     @Override
     public OrderResponse removeOrderDetail(String orderId, String detailId) {
@@ -176,6 +171,22 @@ public class OrderServiceImpl implements OrderService {
         if (order.getOrderDetails().isEmpty())
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Constant.ERROR_ORDER_CANNOT_EMPTY);
 
+        Person person = personService.getOne(order.getPerson().getId());
+
+        Set<Store> uniqueStores = order.getOrderDetails().stream()
+                .map(orderDetail -> orderDetail.getProduct().getStore())
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        order.getOrderDetails().forEach(orderDetail -> uniqueStores.forEach(store -> {
+            Shipment newShipment = Shipment.builder()
+                    .deliveryFrom(store.getAddress())
+                    .deliveryTo(person.getAddress())
+                    .orderDetail(orderDetail)
+                    .build();
+            orderDetail.setShipment(newShipment);
+        }));
+
         order.setOrderStatus(OrderStatus.PENDING);
         Order updatedOrder = orderRepository.saveAndFlush(order);
 
@@ -184,30 +195,44 @@ public class OrderServiceImpl implements OrderService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public OrderResponse updateOrderStatus(String orderId, UpdateOrderStatusRequest request) {
+    public OrderResponse cancelOrder(String orderId) {
+        Order order = getOne(orderId);
+        if (order.getOrderStatus() != OrderStatus.PENDING) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Constant.ERROR_ORDER_IS_NOT_PENDING);
+        }
+
+        order.getOrderDetails().forEach(orderDetail -> {
+            log.error(orderDetail.getShipment().getId());
+            if (orderDetail.getShipment().getId() != null) {
+                orderDetail.setShipment(null);
+            }
+        });
+
+        order.setOrderStatus(OrderStatus.DRAFT);
+
+        orderRepository.saveAndFlush(order);
+        return MapperUtil.toOrderResponse(order);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void updateOrderStatus(String orderId, UpdateOrderStatusRequest request) {
         validationUtil.validate(request);
         Order order = getOne(orderId);
         order.setOrderStatus(request.getStatus());
-        Order updatedOrder = orderRepository.save(order);
-        return MapperUtil.toOrderResponse(updatedOrder);
+        orderRepository.save(order);
     }
 
     @Transactional(readOnly = true)
     @Override
     public Order getOne(String orderId) {
-        Optional<Order> byId = orderRepository.findById(orderId);
-        if (byId.isPresent()) {
-            Order order = byId.get();
-            List<OrderDetail> orderDetailList = new ArrayList<>(order.getOrderDetails());
-            order.setOrderDetails(orderDetailList);
-            return order;
-        }
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, Constant.ERROR_ORDER_NOT_FOUND);
+        return orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, Constant.ERROR_ORDER_NOT_FOUND));
     }
 
     @Transactional(readOnly = true)
     @Override
-    public List<OrderDetailResponse> getAllDetailByOrderId(String orderId) {
+    public List<ProductDetailResponse> getAllDetailByOrderId(String orderId) {
         Order order = getOne(orderId);
         List<OrderDetail> orderDetailList = new ArrayList<>(order.getOrderDetails());
         return orderDetailList.stream().map(MapperUtil::toOrderDetailResponse).toList();

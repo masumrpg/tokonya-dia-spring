@@ -14,7 +14,6 @@ public class MapperUtil {
         return PersonResponse.builder()
                 .id(person.getId())
                 .name(person.getName())
-                .imageUrl(person.getImgUrl())
                 .gender(person.getGender().getDescription())
                 .address(person.getAddress())
                 .phoneNumber(person.getPhoneNumber())
@@ -24,13 +23,6 @@ public class MapperUtil {
     }
 
     public static ProductResponse toProductResponse(Product product) {
-        Optional<List<ProductPromo>> productPromoOpts = Optional.ofNullable(product.getProductPromo());
-        List<ProductPromoResponse> promoResponses = productPromoOpts
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(MapperUtil::toProductPromoResponse)
-                .toList();
-
         return ProductResponse.builder()
                 .id(product.getId())
                 .name(product.getName())
@@ -40,7 +32,6 @@ public class MapperUtil {
                 .stock(product.getStock())
                 .storeId(product.getStore().getId())
                 .images(product.getProductImages() != null ? product.getProductImages().stream().map(MapperUtil::toProductImageResponse).toList() : new ArrayList<>())
-                .productPromoId(promoResponses)
                 .build();
     }
 
@@ -55,45 +46,60 @@ public class MapperUtil {
                 .build();
     }
 
-    public static OrderDetailResponse toOrderDetailResponse(OrderDetail orderDetail) {
-        return OrderDetailResponse.builder()
-                .productId(orderDetail.getId())
+    public static ProductDetailResponse toOrderDetailResponse(OrderDetail orderDetail) {
+        return ProductDetailResponse.builder()
+                .productId(orderDetail.getProduct().getId())
                 .productName(orderDetail.getProduct().getName())
-                .storeName(orderDetail.getProduct().getStore().getName())
                 .price(orderDetail.getProduct().getPrice())
                 .quantity(orderDetail.getQuantity())
                 .build();
     }
 
-    public static List<OrderDetailResponse> toOrderDetailListResponse(List<OrderDetail> orderDetail) {
-        List<OrderDetailResponse> orderDetailResponse = new ArrayList<>();
-        orderDetail.forEach(orderDetail1 -> orderDetailResponse.add(toOrderDetailResponse(orderDetail1)));
-        return orderDetailResponse;
-    }
-
     public static OrderResponse toOrderResponse(Order order) {
-        Optional<List<OrderDetail>> orderDetailsOps = Optional.ofNullable(order.getOrderDetails());
+        Optional<List<OrderDetail>> optionalOrderDetailList = Optional.ofNullable(order.getOrderDetails());
 
-        List<OrderDetailResponse> orderDetailResponses = orderDetailsOps
+        List<OrderDetail> orderDetails = optionalOrderDetailList
                 .orElse(Collections.emptyList())
-                .stream()
-                .map(MapperUtil::toOrderDetailResponse)
-                .toList();
+                .stream().toList();
 
         return OrderResponse.builder()
-                .id(order.getId())
+                .orderId(order.getId())
+                .personId(order.getPerson().getId())
                 .personName(order.getPerson().getName())
                 .personPhoneNumber(order.getPerson().getPhoneNumber())
                 .orderDate(order.getOrderDate().toString())
-                .orderDetails(orderDetailResponses)
                 .orderStatus(String.valueOf(order.getOrderStatus()))
+                .orderDetails(MapperUtil.toOrderListByStoreResponse(orderDetails))
                 .build();
     }
 
-    public static List<OrderResponse> toOrderListResponse(List<Order> orders) {
-        List<OrderResponse> orderResponse = new ArrayList<>();
-        orders.forEach(order -> orderResponse.add(toOrderResponse(order)));
-        return orderResponse;
+    public static List<OrderByStoreResponse> toOrderListByStoreResponse(List<OrderDetail> orderDetails) {
+        List<OrderByStoreResponse> orderList = new ArrayList<>();
+        List<ProductDetailResponse> productDetailResponse = MapperUtil.toProductDetailResponse(orderDetails);
+
+        orderDetails.forEach(orderDetail -> orderList.add(
+                OrderByStoreResponse.builder()
+                        .orderDetailId(orderDetail.getId())
+                        .storeId(orderDetail.getProduct().getStore().getId())
+                        .storeName(orderDetail.getProduct().getStore().getName())
+                        .products(productDetailResponse)
+                        .shipment(orderDetail.getShipment() != null ? toShipmentResponse(orderDetail.getShipment()) : null)
+                        .build()
+        ));
+        return orderList;
+    }
+
+    public static List<ProductDetailResponse> toProductDetailResponse(List<OrderDetail> orderDetails) {
+        List<ProductDetailResponse> productDetailResponse = new ArrayList<>();
+        orderDetails.forEach(orderDetail -> productDetailResponse.add(
+                ProductDetailResponse.builder()
+                        .productId(orderDetail.getProduct().getId())
+                        .productName(orderDetail.getProduct().getName())
+                        .price(orderDetail.getProduct().getPrice())
+                        .quantity(orderDetail.getQuantity())
+                        .build()
+        ));
+        return productDetailResponse;
     }
 
     public static UserResponse toUserResponse(UserAccount userAccount) {
@@ -112,28 +118,13 @@ public class MapperUtil {
                 .build();
     }
 
-    public static ProductPromoResponse toProductPromoResponse(ProductPromo productPromo) {
-        return ProductPromoResponse.builder()
-                .id(productPromo.getId())
-                .promoId(productPromo.getProduct().getId())
-                .promoCode(productPromo.getPromoCode())
-                .discount(productPromo.getDiscountPercentage())
-                .startDateTime(productPromo.getStartDateTime().toString())
-                .endDateTime(productPromo.getEndDateTime().toString())
-                .build();
-    }
-
     public static ShipmentResponse toShipmentResponse(Shipment shipment) {
         return ShipmentResponse.builder()
                 .shipmentId(shipment.getId())
-                .orderId(shipment.getOrder().getId())
-                .courierName(shipment.getCourierName().getDescription())
-                .receipt(shipment.getReceipt())
+                .orderDetailId(shipment.getOrderDetail().getId())
                 .deliveryDate(shipment.getDeliveryDate().toString())
                 .deliveryFrom(shipment.getDeliveryFrom())
                 .deliveryTo(shipment.getDeliveryTo())
-                .estimateDate(shipment.getEstimateDate().toString())
-                .status(shipment.getStatus().toString())
                 .build();
     }
 

@@ -9,12 +9,8 @@ import lombok.*;
 @Builder
 public class ShipmentResponse {
     private String shipmentId;
-    private String orderId;
-    private String courierName;
-    private String receipt;
+    private String orderDetailId;
     private String deliveryDate;
     private String deliveryFrom;
     private String deliveryTo;
-    private String estimateDate;
-    private String status;
 }

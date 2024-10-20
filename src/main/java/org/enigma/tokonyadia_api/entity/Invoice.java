@@ -40,7 +40,7 @@ public class Invoice extends Auditable<String> {
     @Column(name = "shop_count", nullable = false)
     private Integer shopCount;
 
-    @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<InvoiceItem> invoiceItems;
 
     @PrePersist

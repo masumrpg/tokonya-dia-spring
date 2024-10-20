@@ -1,5 +1,7 @@
 package org.enigma.tokonyadia_api.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.enigma.tokonyadia_api.dto.response.FileDownloadResponse;
 import org.enigma.tokonyadia_api.service.ProductImageService;
@@ -15,10 +17,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/api")
+@Tag(name = "File Management", description = "APIs for managing file uploads and downloads")
 public class FileController {
 
     private final ProductImageService productImageService;
 
+    /**
+     * Download an image by its ID.
+     *
+     * @param id the ID of the image to download
+     * @return the response entity containing the image file
+     */
+    @Operation(summary = "Download Image", description = "Download an image file by its ID")
     @GetMapping(path = "/images/{id}")
     public ResponseEntity<?> downloadImage(@PathVariable String id) {
         FileDownloadResponse response = productImageService.downloadImage(id);
@@ -29,5 +39,4 @@ public class FileController {
                 .contentType(MediaType.valueOf(response.getContentType()))
                 .body(response.getResource());
     }
-
 }

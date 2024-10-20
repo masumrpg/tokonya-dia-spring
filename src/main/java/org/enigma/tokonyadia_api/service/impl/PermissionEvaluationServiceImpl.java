@@ -19,7 +19,7 @@ public class PermissionEvaluationServiceImpl implements PermissionEvaluationServ
     @Transactional(readOnly = true)
     @Override
     public boolean hasAccessToCustomerAndSeller(String personId, String userId) {
-        Person person = personService.getOneById(personId);
+        Person person = personService.getOne(personId);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserAccount userAccount = (UserAccount) authentication.getPrincipal();
         return !userAccount.getRole().equals(UserRole.ROLE_CUSTOMER) && !userAccount.getRole().equals(UserRole.ROLE_SELLER) || userAccount.getId().equals(person.getUserAccount().getId());

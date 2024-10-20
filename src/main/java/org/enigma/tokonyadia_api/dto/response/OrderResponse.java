@@ -11,10 +11,11 @@ import java.util.List;
 @Builder
 @ToString
 public class OrderResponse {
-    private String id;
+    private String orderId;
+    private String personId;
     private String personName;
     private String personPhoneNumber;
     private String orderDate;
     private String orderStatus;
-    private List<OrderDetailResponse> orderDetails;
+    private List<OrderByStoreResponse> orderDetails;
 }

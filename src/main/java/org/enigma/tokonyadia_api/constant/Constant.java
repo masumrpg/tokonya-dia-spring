@@ -9,7 +9,6 @@ public class Constant {
     public static final String PRODUCT_CATEGORY_TABLE = "m_product_category";
     public static final String PAYMENT_TABLE = "m_payment";
     public static final String SHIPMENT_TABLE = "t_shipment";
-    public static final String PRODUCT_PROMO_TABLE = "t_product_promo";
     public static final String PRODUCT_RATING_TABLE = "t_product_rating";
     public static final String ORDER_TABLE = "t_order";
     public static final String ORDER_DETAIL_TABLE = "t_order_detail";
@@ -31,7 +30,6 @@ public class Constant {
     public static final String PRODUCT_CATEGORY_API = "/api/products/categories";
     public static final String SHIPMENT_API = "/api/shipments";
     public static final String PRODUCT_RATING_API = "/api/products/ratings";
-    public static final String PRODUCT_PROMO_API = "/api/products/promos";
     public static final String PAYMENT_API = "/api/payments";
 
     // Message
@@ -109,7 +107,7 @@ public class Constant {
     public static final String ERROR_ORDER_NOT_FOUND = "Order not found";
     public static final String ERROR_ADD_ITEMS_TO_NON_DRAFT = "Error add items to non draft";
     public static final String ERROR_CHECKOUT_NON_DRAFT = "Error checkout non draft";
-    public static final String ERROR_ORDER_CANNOT_EMPTY = "Error order cannot be empty";
+    public static final String ERROR_ORDER_CANNOT_EMPTY = "Error order details cannot be empty";
     public static final String ERROR_ORDER_IS_NOT_PENDING = "Order is not PENDING";
     // shipment
     public static final String ERROR_SHIPMENT_NOT_FOUND = "Shipment not found";
