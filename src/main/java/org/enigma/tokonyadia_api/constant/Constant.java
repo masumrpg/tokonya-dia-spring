@@ -7,7 +7,7 @@ public class Constant {
     public static final String STORE_TABLE = "m_store";
     public static final String PRODUCT_TABLE = "m_product";
     public static final String PRODUCT_CATEGORY_TABLE = "m_product_category";
-    public static final String PAYMENT_TABLE = "m_payment";
+    public static final String PAYMENT_TABLE = "t_payment";
     public static final String SHIPMENT_TABLE = "t_shipment";
     public static final String PRODUCT_RATING_TABLE = "t_product_rating";
     public static final String ORDER_TABLE = "t_order";
@@ -28,9 +28,9 @@ public class Constant {
     public static final String STORE_API = "/api/stores";
     public static final String ORDER_API = "/api/orders";
     public static final String PRODUCT_CATEGORY_API = "/api/products/categories";
-    public static final String SHIPMENT_API = "/api/shipments";
     public static final String PRODUCT_RATING_API = "/api/products/ratings";
     public static final String PAYMENT_API = "/api/payments";
+    public static final String INVOICE_API = "/api/invoices";
 
     // Message
     // user
@@ -77,14 +77,11 @@ public class Constant {
     // Checkout
     public static final String SUCCESS_CHECKOUT_ORDER = "Successfully checkout order";
     // shipment
-    public static final String SUCCESS_GET_SHIPMENT = "Successfully get shipment";
-    public static final String SUCCESS_GET_ALL_SHIPMENT = "Successfully get all shipments";
-    // promo
-    public static final String SUCCESS_CREATE_PROMO = "Successfully create promo";
-    public static final String SUCCESS_GET_PRODUCT_PROMO = "Successfully get promo";
-    public static final String SUCCESS_UPDATE_PRODUCT_PROMO = "Successfully update promo";
-    public static final String SUCCESS_DELETE_PRODUCT_PROMO = "Successfully delete promo";
-    public static final String SUCCESS_GET_ALL_PRODUCT_PROMO = "Successfully get all promo";
+//    public static final String SUCCESS_GET_SHIPMENT = "Successfully get shipment";
+//    public static final String SUCCESS_GET_ALL_SHIPMENT = "Successfully get all shipments";
+
+    // invoice
+    public static final String SUCCESS_GET_INVOICE = "Successfully get invoice";
     // OK
     public static final String OK = "OK";
 
@@ -116,4 +113,7 @@ public class Constant {
     // product promo
     public static final String ERROR_PRODUCT_PROMO_NOT_FOUND = "Product promo not found";
     public static final String ERROR_REMOVE_ITEMS_FROM_NON_DRAFT = "Error remove items from non draft";
+    // invoice
+    public static final String ERROR_INVOICE_ALREADY_EXIST = "Invoice already exists";
+    public static final String ERROR_INVOICE_NOT_FOUND = "Invoice not found";
 }

@@ -1,5 +1,6 @@
 package org.enigma.tokonyadia_api.service;
 
+import org.enigma.tokonyadia_api.constant.OrderStatus;
 import org.enigma.tokonyadia_api.dto.request.OrderDetailRequest;
 import org.enigma.tokonyadia_api.dto.request.SearchCommonRequest;
 import org.enigma.tokonyadia_api.dto.request.OrderRequest;
@@ -27,6 +28,8 @@ public interface OrderService {
     OrderResponse cancelOrder(String orderId);
 
     void updateOrderStatus(String orderId, UpdateOrderStatusRequest request);
+
+    void updateOrderStatus(String orderId, OrderStatus orderStatus);
 
     Order getOne(String id);
 

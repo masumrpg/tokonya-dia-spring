@@ -223,6 +223,16 @@ public class OrderServiceImpl implements OrderService {
         orderRepository.save(order);
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void updateOrderStatus(String orderId, OrderStatus orderStatus) {
+        Order order = getOne(orderId);
+        order.setOrderStatus(orderStatus);
+        Order updatedOrder = orderRepository.save(order);
+        MapperUtil.toOrderResponse(updatedOrder);
+    }
+
+
     @Transactional(readOnly = true)
     @Override
     public Order getOne(String orderId) {

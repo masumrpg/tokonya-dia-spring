@@ -24,12 +24,7 @@ import org.springframework.web.bind.annotation.*;
 public class ProductRatingController {
     private final ProductRatingService productRatingService;
 
-    /**
-     * Create a new product rating.
-     *
-     * @param request the product rating details
-     * @return the response entity with created product rating details
-     */
+
     @Operation(summary = "Create Product Rating", description = "Create a new product rating")
     @PostMapping
     public ResponseEntity<?> createProduct(@RequestBody ProductRatingRequest request) {
@@ -37,12 +32,6 @@ public class ProductRatingController {
         return ResponseUtil.buildCommonResponse(HttpStatus.CREATED, Constant.SUCCESS_CREATE_PRODUCT_RATING, productRatingResponse);
     }
 
-    /**
-     * Get a product rating by ID.
-     *
-     * @param ratingId the ID of the product rating
-     * @return the response entity with product rating details
-     */
     @Operation(summary = "Get Product Rating by ID", description = "Retrieve a product rating by its ID")
     @GetMapping("/{ratingId}")
     public ResponseEntity<?> getProductRating(@PathVariable String ratingId) {
@@ -50,13 +39,6 @@ public class ProductRatingController {
         return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_GET_PRODUCT_RATING, productRatingResponse);
     }
 
-    /**
-     * Update an existing product rating by ID.
-     *
-     * @param ratingId the ID of the product rating
-     * @param request  the updated product rating details
-     * @return the response entity with updated product rating details
-     */
     @Operation(summary = "Update Product Rating", description = "Update an existing product rating by its ID")
     @PutMapping("/{ratingId}")
     public ResponseEntity<?> updateProduct(@PathVariable String ratingId, @RequestBody UpdateProductRatingRequest request) {
@@ -64,12 +46,6 @@ public class ProductRatingController {
         return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_UPDATE_PRODUCT_RATING, productRatingResponse);
     }
 
-    /**
-     * Delete a product rating by ID.
-     *
-     * @param ratingId the ID of the product rating to delete
-     * @return the response entity indicating success
-     */
     @Operation(summary = "Delete Product Rating", description = "Delete a product rating by its ID")
     @DeleteMapping("/{ratingId}")
     public ResponseEntity<?> deleteProduct(@PathVariable String ratingId) {
@@ -77,17 +53,6 @@ public class ProductRatingController {
         return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_UPDATE_DELETE_RATING, null);
     }
 
-    /**
-     * Get all product ratings with pagination and filtering options.
-     *
-     * @param page     the page number (default: 1)
-     * @param size     the page size (default: 10)
-     * @param sort     the sort field
-     * @param query    the search query
-     * @param minPrice the minimum price filter
-     * @param maxPrice the maximum price filter
-     * @return the response entity with a paginated list of product ratings
-     */
     @Operation(summary = "Get All Product Ratings", description = "Retrieve all product ratings with pagination and filtering")
     @GetMapping
     public ResponseEntity<?> getAllProductRating(

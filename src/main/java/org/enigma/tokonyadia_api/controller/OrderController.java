@@ -30,12 +30,7 @@ import java.util.List;
 public class OrderController {
     private final OrderService orderService;
 
-    /**
-     * Create a new draft order.
-     *
-     * @param request the order request
-     * @return the response entity with created order details
-     */
+
     @Operation(summary = "Create Order Draft", description = "Create a new draft order")
     @PostMapping(path = "/draft")
     public ResponseEntity<?> createDraft(@RequestBody OrderRequest request) {
@@ -43,12 +38,6 @@ public class OrderController {
         return ResponseUtil.buildCommonResponse(HttpStatus.CREATED, Constant.SUCCESS_CREATED_ORDER, orderResponse);
     }
 
-    /**
-     * Retrieve an order by its ID.
-     *
-     * @param orderId the ID of the order to retrieve
-     * @return the response entity with order details
-     */
     @Operation(summary = "Get Order by ID", description = "Retrieve an order by its ID")
     @GetMapping("/{orderId}")
     public ResponseEntity<?> getOrderById(@Parameter(description = "ID of the order to retrieve") @PathVariable String orderId) {
@@ -56,13 +45,6 @@ public class OrderController {
         return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_GET_ORDER, orderResponse);
     }
 
-    /**
-     * Add details to an existing order.
-     *
-     * @param orderId the ID of the order to which details will be added
-     * @param request the order detail request
-     * @return the response entity with updated order details
-     */
     @Operation(summary = "Add Order Details", description = "Add details to an existing order")
     @PostMapping("/{orderId}/details/add")
     public ResponseEntity<?> addOrderDetailsById(
@@ -72,13 +54,6 @@ public class OrderController {
         return ResponseUtil.buildCommonResponse(HttpStatus.CREATED, Constant.SUCCESS_CREATE_ORDER_DETAIL, orderDetailResponseList);
     }
 
-    /**
-     * Decrease details in an existing order.
-     *
-     * @param orderId the ID of the order to decrease details from
-     * @param request the order detail request
-     * @return the response entity with updated order details
-     */
     @Operation(summary = "Decrease Order Details", description = "Decrease details in an existing order")
     @PostMapping("/{orderId}/details/decrease")
     public ResponseEntity<?> decreaseOrderById(
@@ -88,13 +63,7 @@ public class OrderController {
         return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_DECREASE_ORDER_DETAIL, orderDetailResponses);
     }
 
-    /**
-     * Remove a specific detail from an order.
-     *
-     * @param orderId       the ID of the order
-     * @param orderDetailId the ID of the order detail to remove
-     * @return the response entity with updated order details
-     */
+
     @Operation(summary = "Remove Order Detail", description = "Remove a specific detail from an order")
     @DeleteMapping("/{orderId}/details/{orderDetailId}")
     public ResponseEntity<?> removeOrderDetailById(
@@ -106,12 +75,6 @@ public class OrderController {
         return ResponseUtil.buildCommonResponse(HttpStatus.OK, "Successfully removed order detail", orderResponse);
     }
 
-    /**
-     * Checkout an existing order.
-     *
-     * @param orderId the ID of the order to checkout
-     * @return the response entity with order checkout details
-     */
     @Operation(summary = "Checkout Order", description = "Checkout an existing order")
     @PostMapping("/{orderId}/checkout")
     public ResponseEntity<?> checkoutOrder(@Parameter(description = "ID of the order to checkout") @PathVariable String orderId) {
@@ -119,12 +82,6 @@ public class OrderController {
         return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_CHECKOUT_ORDER, orderResponse);
     }
 
-    /**
-     * Cancel an existing order.
-     *
-     * @param orderId the ID of the order to cancel
-     * @return the response entity with order cancellation details
-     */
     @Operation(summary = "Cancel Order", description = "Cancel an existing order")
     @PostMapping("/{orderId}/cancel")
     public ResponseEntity<?> cancelOrder(@Parameter(description = "ID of the order to cancel") @PathVariable String orderId) {
@@ -132,28 +89,13 @@ public class OrderController {
         return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_CHECKOUT_ORDER, orderResponse);
     }
 
-    /**
-     * Retrieve all details for a specific order.
-     *
-     * @param orderId the ID of the order to get details for
-     * @return the response entity with list of order details
-     */
     @Operation(summary = "Get All Order Details", description = "Retrieve all details for a specific order")
     @GetMapping("/{orderId}/details")
     public ResponseEntity<?> getAllOrderDetailsById(@Parameter(description = "ID of the order to get details for") @PathVariable String orderId) {
         List<ProductDetailResponse> productDetailResponseList = orderService.getAllDetailByOrderId(orderId);
         return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_GET_ORDER_DETAIL, productDetailResponseList);
     }
-
-    /**
-     * Retrieve all orders with pagination and filtering.
-     *
-     * @param page  the page number to retrieve
-     * @param size  the number of orders per page
-     * @param sort  the sorting criteria
-     * @param query the search query
-     * @return the response entity with list of orders
-     */
+    
     @Operation(summary = "Get All Orders", description = "Retrieve all orders with pagination and filtering")
     @GetMapping
     public ResponseEntity<?> getAllOrders(

@@ -21,14 +21,11 @@ public class InvoiceItem extends Auditable<String> {
     @JoinColumn(name = "invoice_id", nullable = false)
     private Invoice invoice;
 
-    @Column(name = "shop_name", nullable = false)
-    private String shopName;
-
     @Column(name = "product_name", nullable = false)
     private String productName;
 
     @Column(name = "quantity", nullable = false)
-    private int quantity;
+    private Integer quantity;
 
     @Column(name = "product_price", nullable = false)
     private Long productPrice;

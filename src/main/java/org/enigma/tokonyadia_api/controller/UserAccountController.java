@@ -22,12 +22,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserAccountController {
     private final UserAccountService userAccountService;
 
-    /**
-     * Create a new user account.
-     *
-     * @param request the user details
-     * @return the response entity with created user details
-     */
+
     @Operation(summary = "Create User", description = "Create a new user account")
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
@@ -36,23 +31,14 @@ public class UserAccountController {
         return ResponseUtil.buildCommonResponse(HttpStatus.CREATED, Constant.SUCCESS_CREATE_USER, userResponse);
     }
 
-    /**
-     * Get the authenticated user's information.
-     *
-     * @return the response entity with user information
-     */
+
     @Operation(summary = "Get Self Info", description = "Retrieve the authenticated user's information")
     @GetMapping("/me")
     public ResponseEntity<?> getSelfInfo() {
         UserResponse userResponse = userAccountService.getAuthentication();
         return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_FETCH_USER_INFO, userResponse);
     }
-
-    /**
-     * Soft delete the authenticated user's account.
-     *
-     * @return the response entity indicating success
-     */
+    
     @Operation(summary = "Delete Self Account", description = "Soft delete the authenticated user's account")
     @DeleteMapping("/me")
     public ResponseEntity<?> deleteSelf() {
@@ -60,12 +46,6 @@ public class UserAccountController {
         return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_DELETE_SELF, null);
     }
 
-    /**
-     * Reactivate a soft deleted user account.
-     *
-     * @param request the user details for reactivation
-     * @return the response entity indicating success
-     */
     @Operation(summary = "Reactivate Account", description = "Reactivate a soft deleted user account")
     @PostMapping("/reactivate")
     public ResponseEntity<?> reactivateAccount(@RequestBody UserRequest request) {

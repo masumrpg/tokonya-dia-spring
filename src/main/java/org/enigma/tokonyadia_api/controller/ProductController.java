@@ -30,13 +30,7 @@ public class ProductController {
     private final ProductService productServiceImpl;
     private final ObjectMapper objectMapper;
 
-    /**
-     * Create a new product with images.
-     *
-     * @param multipartFiles the list of product images
-     * @param product        the product details as a JSON string
-     * @return the response entity with product details
-     */
+
     @Operation(summary = "Create Product", description = "Create a new product with optional images")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> createProduct(
@@ -52,12 +46,6 @@ public class ProductController {
         }
     }
 
-    /**
-     * Get a product by ID.
-     *
-     * @param productId the ID of the product
-     * @return the response entity with product details
-     */
     @Operation(summary = "Get Product by ID", description = "Retrieve a product by its ID")
     @GetMapping(path = "/{productId}")
     public ResponseEntity<?> getProductById(@PathVariable String productId) {
@@ -65,13 +53,6 @@ public class ProductController {
         return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_GET_PRODUCT, productResponse);
     }
 
-    /**
-     * Update an existing product by ID.
-     *
-     * @param productId the ID of the product
-     * @param product   the updated product details
-     * @return the response entity with updated product details
-     */
     @Operation(summary = "Update Product", description = "Update an existing product by its ID")
     @PutMapping("/{productId}")
     public ResponseEntity<?> updateProduct(@PathVariable String productId, @RequestBody UpdateProductRequest product) {
@@ -79,12 +60,6 @@ public class ProductController {
         return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_UPDATE_PRODUCT, productResponse);
     }
 
-    /**
-     * Delete a product by ID.
-     *
-     * @param productId the ID of the product to delete
-     * @return the response entity indicating success
-     */
     @Operation(summary = "Delete Product", description = "Delete a product by its ID")
     @DeleteMapping("/{productId}")
     public ResponseEntity<?> deleteProduct(@PathVariable String productId) {
@@ -92,17 +67,6 @@ public class ProductController {
         return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_DELETE_PRODUCT, null);
     }
 
-    /**
-     * Get all products with pagination and filtering options.
-     *
-     * @param page     the page number (default: 1)
-     * @param size     the page size (default: 10)
-     * @param sort     the sort field
-     * @param query    the search query
-     * @param minPrice the minimum price filter
-     * @param maxPrice the maximum price filter
-     * @return the response entity with a paginated list of products
-     */
     @Operation(summary = "Get All Products", description = "Retrieve all products with pagination and filtering")
     @GetMapping
     public ResponseEntity<?> getAllProducts(

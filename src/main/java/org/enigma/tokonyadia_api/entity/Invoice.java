@@ -5,7 +5,6 @@ import lombok.*;
 import org.enigma.tokonyadia_api.audit.Auditable;
 import org.enigma.tokonyadia_api.constant.Constant;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -20,31 +19,22 @@ public class Invoice extends Auditable<String> {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @Column(name = "invoice_number", nullable = false, unique = true, length = 100)
-    private String invoiceNumber;
-
     @ManyToOne
-    @JoinColumn(name = "person_id", nullable = false)
-    private Person person;
+    @JoinColumn(name = "order_id", nullable = false)
+    private Order order;
+
+    @Column(name = "invoice_code", nullable = false, unique = true, length = 100)
+    private String invoiceCode;
+
+    @Column(name = "customer_name", nullable = false)
+    private String customerName;
 
     @Column(name = "total_amount", nullable = false)
     private Double totalAmount;
 
-    @Column(name = "shipping_cost", nullable = false)
-    private Double shippingCost;
-
-    @Column(name = "purchase_date", nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime purchaseDate;
-
-    @Column(name = "shop_count", nullable = false)
-    private Integer shopCount;
+    @Column(name = "shop_name", nullable = false)
+    private String shopName;
 
     @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<InvoiceItem> invoiceItems;
-
-    @PrePersist
-    protected void onCreate() {
-        purchaseDate = LocalDateTime.now();
-    }
 }

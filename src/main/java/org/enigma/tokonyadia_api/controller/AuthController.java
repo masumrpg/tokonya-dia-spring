@@ -39,13 +39,7 @@ public class AuthController {
 
     private final AuthService authService;
 
-    /**
-     * Login a user and generate access and refresh tokens.
-     *
-     * @param request  the authentication request containing username and password
-     * @param response the HTTP response to set the refresh token cookie
-     * @return the authentication response containing tokens
-     */
+
     @Operation(summary = "User Login", description = "Authenticate a user and return access and refresh tokens")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Login successful",
@@ -58,13 +52,7 @@ public class AuthController {
         return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_LOGIN, authResponse);
     }
 
-    /**
-     * Refresh access token using the refresh token from the cookie.
-     *
-     * @param request  the HTTP request to get the refresh token from the cookie
-     * @param response the HTTP response to set the new refresh token cookie
-     * @return the new authentication response containing tokens
-     */
+
     @Operation(summary = "Refresh Access Token", description = "Generate a new access token using the refresh token")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Token refreshed successfully",
@@ -78,12 +66,7 @@ public class AuthController {
         return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_GENERATED_ACCESS_TOKEN, authResponse);
     }
 
-    /**
-     * Logout a user by invalidating the access token.
-     *
-     * @param request the HTTP request containing the bearer token
-     * @return a response indicating the logout status
-     */
+
     @SecurityRequirement(name = "Bearer Authentication")
     @Operation(summary = "User Logout", description = "Logout a user by invalidating their access token")
     @ApiResponses(value = {

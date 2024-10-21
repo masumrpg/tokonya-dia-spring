@@ -22,12 +22,6 @@ public class FileController {
 
     private final ProductImageService productImageService;
 
-    /**
-     * Download an image by its ID.
-     *
-     * @param id the ID of the image to download
-     * @return the response entity containing the image file
-     */
     @Operation(summary = "Download Image", description = "Download an image file by its ID")
     @GetMapping(path = "/images/{id}")
     public ResponseEntity<?> downloadImage(@PathVariable String id) {

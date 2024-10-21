@@ -144,4 +144,28 @@ public class MapperUtil {
                 .url("/api/images/" + productImage.getId())
                 .build();
     }
+
+    public static InvoiceResponse toInvoiceResponse(Invoice invoice) {
+        List<InvoiceItemResponse> invoiceItemResponseList = invoice.getInvoiceItems()
+                .stream().map(MapperUtil::toInvoiceItemResponse).toList();
+        return InvoiceResponse.builder()
+                .id(invoice.getId())
+                .orderId(invoice.getOrder().getId())
+                .invoiceCode(invoice.getInvoiceCode())
+                .customerName(invoice.getCustomerName())
+                .totalAmount(invoice.getTotalAmount())
+                .shopName(invoice.getShopName())
+                .items(invoiceItemResponseList)
+                .build();
+    }
+
+    public static InvoiceItemResponse toInvoiceItemResponse(InvoiceItem invoiceItem) {
+        return InvoiceItemResponse.builder()
+                .itemId(invoiceItem.getId())
+                .productName(invoiceItem.getProductName())
+                .quantity(invoiceItem.getQuantity())
+                .price(invoiceItem.getProductPrice())
+                .totalPrice(invoiceItem.getTotalPrice())
+                .build();
+    }
 }

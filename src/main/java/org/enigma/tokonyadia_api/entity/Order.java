@@ -40,6 +40,9 @@ public class Order extends Auditable<String> {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderDetail> orderDetails;
 
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Invoice> invoices;
+
     @PrePersist
     protected void onCreate() {
         this.orderDate = LocalDateTime.now();

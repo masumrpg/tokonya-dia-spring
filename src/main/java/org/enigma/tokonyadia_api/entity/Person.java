@@ -41,7 +41,7 @@ public class Person extends Auditable<String> {
     private UserAccount userAccount;
 
     @OneToOne(mappedBy = "person", orphanRemoval = true)
-    private Store stores;
+    private Store store;
 
     @OneToMany(mappedBy = "person", orphanRemoval = true)
     private List<ProductRating> productRatings;

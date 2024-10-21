@@ -8,4 +8,6 @@ public interface PaymentService {
     PaymentResponse createPayment(PaymentRequest request);
 
     void getNotification(MidtransNotificationRequest request);
+
+    PaymentResponse getPaymentStatusByOrderId(String orderId);
 }

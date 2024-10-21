@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class MidtransNotificationRequest {
+public class MidtransTransactionResponse {
     @JsonProperty(value = "transaction_type")
     public String transactionType;
 
