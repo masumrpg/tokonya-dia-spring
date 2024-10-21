@@ -3,7 +3,7 @@ package org.enigma.tokonyadia_api.util;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-public class InvoiceNumberGenerator {
+public class InvoiceCodeGenerator {
     public static String generateInvoiceCode(String storeName, String orderId) {
         String prefix = "INV";
 

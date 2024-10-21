@@ -18,7 +18,7 @@ import org.enigma.tokonyadia_api.service.InvoiceService;
 import org.enigma.tokonyadia_api.service.OrderService;
 import org.enigma.tokonyadia_api.service.PaymentService;
 import org.enigma.tokonyadia_api.util.HashUtil;
-import org.enigma.tokonyadia_api.util.InvoiceNumberGenerator;
+import org.enigma.tokonyadia_api.util.InvoiceCodeGenerator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -127,7 +127,7 @@ public class PaymentServiceImpl implements PaymentService {
                 List<InvoiceItem> invoiceItems = new ArrayList<>();
                 Invoice invoice = Invoice.builder()
                         .order(payment.getOrder())
-                        .invoiceCode(InvoiceNumberGenerator.generateInvoiceCode(store.getName(), payment.getId())) // Gunakan nama store dari store saat ini
+                        .invoiceCode(InvoiceCodeGenerator.generateInvoiceCode(store.getName(), payment.getId())) // Gunakan nama store dari store saat ini
                         .customerName(payment.getOrder().getPerson().getName())
                         .shopName(store.getName())
                         .build();
