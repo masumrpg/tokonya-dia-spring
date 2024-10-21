@@ -8,6 +8,7 @@ import org.enigma.tokonyadia_api.constant.Gender;
 
 import java.util.List;
 
+// TODO add image file
 @Entity
 @Setter
 @Getter

@@ -7,6 +7,7 @@ import org.enigma.tokonyadia_api.constant.Constant;
 
 import java.util.List;
 
+// TODO image file
 @Entity
 @Setter
 @Getter

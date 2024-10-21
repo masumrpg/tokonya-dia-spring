@@ -1,6 +1,7 @@
 package org.enigma.tokonyadia_api.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.enigma.tokonyadia_api.dto.response.FileDownloadResponse;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/api")
+@SecurityRequirement(name = "Bearer Authentication")
 @Tag(name = "File Management", description = "APIs for managing file uploads and downloads")
 public class FileController {
 

@@ -11,10 +11,16 @@ import java.util.List;
 @Builder
 public class InvoiceResponse {
     private String id;
+
     private String orderId;
+
     private String invoiceCode;
+
     private String customerName;
+
     private Double totalAmount;
+
     private String shopName;
+
     private List<InvoiceItemResponse> items;
 }

@@ -57,7 +57,7 @@ public class PaymentController {
     @Operation(summary = "Get payment status by order ID",
             description = "Retrieves the payment status for a specific order by its order ID. This checks the current status of the payment in the Midtrans system.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Payment status retrieved successfully", content = @Content(schema = @Schema(implementation = PaymentResponse.class))),
+                    @ApiResponse(responseCode = "200", description = "Payment status retrieved successfully", content = @Content(schema = @Schema(implementation = CommonResponsePaymentResponse.class))),
                     @ApiResponse(responseCode = "404", description = "Order or payment not found", content = @Content(schema = @Schema(implementation = CommonResponse.class))),
                     @ApiResponse(responseCode = "401", description = "Unauthorized access - invalid signature", content = @Content(schema = @Schema(implementation = CommonResponse.class))),
             })

@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.enigma.tokonyadia_api.constant.Constant;
 import org.enigma.tokonyadia_api.dto.request.AuthRequest;
 import org.enigma.tokonyadia_api.dto.response.AuthResponse;
+import org.enigma.tokonyadia_api.dto.response.CommonResponse;
 import org.enigma.tokonyadia_api.service.AuthService;
 import org.enigma.tokonyadia_api.util.ResponseUtil;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,6 +35,9 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 @Tag(name = "Authentication", description = "APIs for user authentication and token management")
 public class AuthController {
+    private static class CommonResponseSchema extends CommonResponse<AuthResponse> {
+    }
+
     @Value("${tokonya.dia.refresh-token-expiration-in-hour}")
     private Integer REFRESH_TOKEN_EXPIRY;
 
@@ -43,7 +47,7 @@ public class AuthController {
     @Operation(summary = "User Login", description = "Authenticate a user and return access and refresh tokens")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Login successful",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponse.class)))
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = CommonResponseSchema.class)))
     })
     @PostMapping(path = "/login")
     public ResponseEntity<?> login(@RequestBody AuthRequest request, HttpServletResponse response) {
