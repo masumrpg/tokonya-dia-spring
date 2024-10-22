@@ -99,6 +99,4 @@ public class AuthController {
         cookie.setMaxAge(60 * 60 * REFRESH_TOKEN_EXPIRY);
         response.addCookie(cookie);
     }
-
-    // TODO add change password
 }

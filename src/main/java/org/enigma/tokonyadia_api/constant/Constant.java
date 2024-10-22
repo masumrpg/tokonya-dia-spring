@@ -72,6 +72,7 @@ public class Constant {
     public static final String SUCCESS_GET_ORDER = "Successfully get orders";
     public static final String SUCCESS_GET_ORDER_DETAIL = "Successfully get orders details";
     public static final String SUCCESS_CHECKOUT = "Checkout Success";
+    public static final String SUCCESS_CANCEL_ORDER = "Successfully get orders";
     // order detail
     public static final String SUCCESS_DECREASE_ORDER_DETAIL = "Successfully decrease order detail";
     // Checkout
@@ -94,6 +95,7 @@ public class Constant {
     public static final String PRODUCT_CATEGORY_NOT_FOUND = "Product category not found";
     public static final String INVALID_CREDENTIALS = "Invalid credentials";
     public static final String ERROR_USERNAME_NOT_FOUND = "User not found";
+    public static final String SUCCESS_UPDATE_PASSWORD = "Successfully update password";
     // store
     public static final String ERROR_STORE_NOT_FOUND = "Store not found";
     // jwt

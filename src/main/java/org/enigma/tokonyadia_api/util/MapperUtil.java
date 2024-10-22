@@ -201,10 +201,10 @@ public class MapperUtil {
 
     private static <T extends Auditable<String>> AuditInfoResponse auditInfoResponse(T auditInfo) {
         return AuditInfoResponse.builder()
-                .createdBy(auditInfo.getCreatedBy())
-                .createdDate(auditInfo.getCreatedDate().toString())
-                .updatedBy(auditInfo.getUpdatedBy())
-                .updatedDate(auditInfo.getUpdatedDate().toString())
+                .createdBy(auditInfo.getCreatedBy() != null ? auditInfo.getCreatedBy() : null)
+                .createdDate(auditInfo.getCreatedDate() != null ? auditInfo.getCreatedDate().toString() : null)
+                .updatedBy(auditInfo.getUpdatedBy() != null ? auditInfo.getUpdatedBy() : null)
+                .updatedDate(auditInfo.getUpdatedDate() != null ? auditInfo.getUpdatedDate().toString() : null)
                 .build();
     }
 }

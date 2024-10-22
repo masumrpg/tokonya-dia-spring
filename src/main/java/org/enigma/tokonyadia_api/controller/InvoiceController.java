@@ -33,7 +33,7 @@ public class InvoiceController {
     @Operation(summary = "Get invoice by id",
             description = "This endpoint get invoice details by id.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Payment created successfully", content = @Content(schema = @Schema(implementation = CommonResponseInvoiceResponse.class))),
+                    @ApiResponse(responseCode = "200", description = "Successfully get invoice by id", content = @Content(schema = @Schema(implementation = CommonResponseInvoiceResponse.class))),
                     @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content(schema = @Schema(implementation = CommonResponse.class))),
                     @ApiResponse(responseCode = "401", description = "Unauthorized access - invalid signature", content = @Content(schema = @Schema(implementation = CommonResponse.class))),
             })

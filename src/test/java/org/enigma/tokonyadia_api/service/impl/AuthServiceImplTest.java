@@ -45,7 +45,7 @@ public class AuthServiceImplTest {
     private AuthServiceImpl authService;
 
     @Test
-    void testLogin_Success() {
+    void testLoginSuccess() {
         AuthRequest request = new AuthRequest("user12345", "Adminalsdwkkadkjaskdjkasd");
         UserAccount userAccount = new UserAccount();
         userAccount.setId("1");
@@ -67,7 +67,7 @@ public class AuthServiceImplTest {
     }
 
     @Test
-    void testRefreshToken_Success() {
+    void testRefreshTokenSuccess() {
         String token = "refreshToken";
         UserAccount userAccount = new UserAccount();
         userAccount.setId("1");
@@ -87,7 +87,7 @@ public class AuthServiceImplTest {
     }
 
     @Test
-    void testLogout_Success() {
+    void testLogoutSuccess() {
         UserAccount userAccount = new UserAccount();
         userAccount.setId("1");
 

@@ -97,11 +97,13 @@ public class UserAccountServiceImpl implements UserAccountService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void updatePassword(String id, UserUpdatePasswordRequest request) {
+    public void updatePassword(UserUpdatePasswordRequest request) {
         validationUtil.validate(request);
-        UserAccount userAccount = getById(id);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserAccount account = (UserAccount) authentication.getPrincipal();
+        UserAccount userAccount = getById(account.getId());
 
-        if (!passwordEncoder.matches(userAccount.getPassword(), request.getCurrentPassword())) {
+        if (!passwordEncoder.matches(request.getCurrentPassword(), userAccount.getPassword())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Constant.INVALID_CREDENTIALS);
         }
 
