@@ -2,6 +2,7 @@ package org.enigma.tokonyadia_api.service.impl;
 
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.enigma.tokonyadia_api.constant.FileType;
 import org.enigma.tokonyadia_api.dto.response.FileInfo;
 import org.enigma.tokonyadia_api.service.FileStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,41 +52,55 @@ public class FileStorageServiceImpl implements FileStorageService {
 
 
     @Override
-    public FileInfo storeFile(MultipartFile multipartFile, String prefixDirectory, List<String> contentTypes) {
+    public FileInfo storeFile(FileType fileType, String prefixDirectory, MultipartFile multipartFile, List<String> contentTypes) {
         try {
             validate(multipartFile, contentTypes);
+            String prefix = fileType.equals(FileType.FILE) ? "files" : "images";
+
             String filename = UUID.randomUUID() + "_" + multipartFile.getOriginalFilename();
-            Path dirPath = directoryPath.resolve(prefixDirectory).normalize();
-            Path filePath = dirPath.resolve(filename).normalize();
+
+            Path dirPath = directoryPath.resolve(prefix).normalize();
+            Path newDirPath = dirPath.resolve(prefixDirectory).normalize();
+
+            if (!Files.exists(newDirPath)) {
+                Files.createDirectories(newDirPath);
+            }
+
+            Path filePath = newDirPath.resolve(filename).normalize();
             Files.copy(multipartFile.getInputStream(), filePath);
             Files.setPosixFilePermissions(filePath, PosixFilePermissions.fromString("rw-r--r--"));
+
+            Path savedPath = Paths.get(prefix).resolve(prefixDirectory).resolve(filename).normalize();
+
             return FileInfo.builder()
                     .filename(filename)
-                    .path(filePath.toString())
+                    .path(savedPath.toString())
                     .build();
         } catch (Exception e) {
             log.error("Error while init directory: {}", e.getMessage());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error while save image");
         }
+
     }
 
     @Override
     public Resource readFile(String path) {
         try {
-            Path filePath = Paths.get(path);
+            Path filePath = directoryPath.resolve(path);
+            log.info("PATH: {}", filePath);
             if (!Files.exists(filePath)) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "image not found");
             return new UrlResource(filePath.toUri());
         } catch (Exception e) {
             log.error("error while read image: {}", e.getMessage());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
-
     }
+
 
     @Override
     public void deleteFile(String path) {
         try {
-            Path filePath = Paths.get(path);
+            Path filePath = directoryPath.resolve(path);
             if (!Files.exists(filePath)) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "image not found");
             Files.delete(filePath);
         } catch (Exception e) {
@@ -93,6 +108,7 @@ public class FileStorageServiceImpl implements FileStorageService {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
+
 
     private void validate(MultipartFile multipartFile, List<String> contentTypes) {
         if (multipartFile.isEmpty())

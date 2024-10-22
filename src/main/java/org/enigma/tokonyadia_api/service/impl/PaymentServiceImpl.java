@@ -19,6 +19,7 @@ import org.enigma.tokonyadia_api.service.OrderService;
 import org.enigma.tokonyadia_api.service.PaymentService;
 import org.enigma.tokonyadia_api.util.HashUtil;
 import org.enigma.tokonyadia_api.util.InvoiceCodeGenerator;
+import org.enigma.tokonyadia_api.util.MapperUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -61,7 +62,7 @@ public class PaymentServiceImpl implements PaymentService {
         paymentRepository.saveAndFlush(payment);
 
         orderService.updateOrderStatus(order.getId(), OrderStatus.PENDING);
-        return mapToPaymentResponse(payment);
+        return MapperUtil.toPaymentResponse(payment);
     }
 
     private long calculateOrderAmount(Order order) {
@@ -114,51 +115,7 @@ public class PaymentServiceImpl implements PaymentService {
         MidtransTransactionResponse transaction = midtransApiClient.getTransactionStatusByOrderId(orderId, headerValue);
         validateSignatureKey(transaction.getOrderId(), transaction.getStatusCode(), transaction.getGrossAmount(), transaction.getSignatureKey());
         Payment payment = updatePaymentStatus(transaction.getOrderId(), transaction.getTransactionStatus());
-
-        boolean existByOrder = invoiceService.existByOrder(payment.getOrder());
-        if (!existByOrder && payment.getPaymentStatus().equals(PaymentStatus.SETTLEMENT)) {
-            Set<Store> uniqueStores = payment.getOrder().getOrderDetails().stream()
-                    .map(orderDetail -> orderDetail.getProduct().getStore())
-                    .collect(Collectors.toSet());
-
-            List<Invoice> invoices = new ArrayList<>();
-
-            for (Store store : uniqueStores) {
-                List<InvoiceItem> invoiceItems = new ArrayList<>();
-                Invoice invoice = Invoice.builder()
-                        .order(payment.getOrder())
-                        .invoiceCode(InvoiceCodeGenerator.generateInvoiceCode(store.getName(), payment.getId())) // Gunakan nama store dari store saat ini
-                        .customerName(payment.getOrder().getPerson().getName())
-                        .shopName(store.getName())
-                        .build();
-
-                payment.getOrder().getOrderDetails().stream()
-                        .filter(orderDetail -> orderDetail.getProduct().getStore().equals(store))
-                        .forEach(orderDetail -> {
-                            InvoiceItem invoiceItem = InvoiceItem.builder()
-                                    .invoice(invoice)
-                                    .productName(orderDetail.getProduct().getName())
-                                    .quantity(orderDetail.getQuantity())
-                                    .productPrice(orderDetail.getPrice())
-                                    .totalPrice((double) (orderDetail.getPrice() * orderDetail.getQuantity()))
-                                    .build();
-                            invoiceItems.add(invoiceItem);
-                        });
-
-                double storeTotalAmount = invoiceItems.stream()
-                        .mapToDouble(InvoiceItem::getTotalPrice)
-                        .sum();
-
-                invoice.setInvoiceItems(invoiceItems);
-                invoice.setTotalAmount(storeTotalAmount);
-
-                invoices.add(invoice);
-            }
-
-            payment.getOrder().getInvoices().addAll(invoices);
-        }
-
-        return mapToPaymentResponse(payment);
+        return MapperUtil.toPaymentResponse(payment);
     }
 
     private Payment getByOrderIdOrThrowNotFound(String orderId) {
@@ -181,7 +138,58 @@ public class PaymentServiceImpl implements PaymentService {
 
         if (newPaymentStatus != null && newPaymentStatus.equals(PaymentStatus.SETTLEMENT)) {
             payment.getOrder().setOrderStatus(OrderStatus.CONFIRMED);
+
+            boolean existByOrder = invoiceService.existByOrder(payment.getOrder());
+            if (!existByOrder) {
+                Set<Store> uniqueStores = payment.getOrder().getOrderDetails().stream()
+                        .map(orderDetail -> orderDetail.getProduct().getStore())
+                        .collect(Collectors.toSet());
+
+                List<Invoice> invoices = new ArrayList<>();
+
+                for (Store store : uniqueStores) {
+                    List<InvoiceItem> invoiceItems = new ArrayList<>();
+                    Invoice invoice = Invoice.builder()
+                            .order(payment.getOrder())
+                            .invoiceCode(InvoiceCodeGenerator.generateInvoiceCode(store.getName(), payment.getId())) // Gunakan nama store dari store saat ini
+                            .customerName(payment.getOrder().getPerson().getName())
+                            .shopName(store.getName())
+                            .build();
+
+                    payment.getOrder().getOrderDetails().stream()
+                            .filter(orderDetail -> orderDetail.getProduct().getStore().equals(store))
+                            .forEach(orderDetail -> {
+                                InvoiceItem invoiceItem = InvoiceItem.builder()
+                                        .invoice(invoice)
+                                        .productName(orderDetail.getProduct().getName())
+                                        .quantity(orderDetail.getQuantity())
+                                        .productPrice(orderDetail.getPrice())
+                                        .totalPrice((double) (orderDetail.getPrice() * orderDetail.getQuantity()))
+                                        .build();
+                                invoiceItems.add(invoiceItem);
+                            });
+
+                    double storeTotalAmount = invoiceItems.stream()
+                            .mapToDouble(InvoiceItem::getTotalPrice)
+                            .sum();
+
+                    invoice.setInvoiceItems(invoiceItems);
+                    invoice.setTotalAmount(storeTotalAmount);
+
+                    invoices.add(invoice);
+                }
+
+                payment.getOrder().getInvoices().addAll(invoices);
+            }
         }
+
+        if (newPaymentStatus != null) {
+            switch (newPaymentStatus) {
+                case DENY, EXPIRE, CANCEL:
+                    payment.getOrder().setOrderStatus(OrderStatus.FAILED);
+            }
+        }
+
 
         paymentRepository.saveAndFlush(payment);
         return payment;
@@ -193,15 +201,5 @@ public class PaymentServiceImpl implements PaymentService {
         if (!signatureKey.equalsIgnoreCase(midtransSignatureKey)) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid signature key");
         }
-    }
-
-    private PaymentResponse mapToPaymentResponse(Payment payment) {
-        return PaymentResponse.builder()
-                .orderId(payment.getOrder().getId())
-                .amount(payment.getAmount())
-                .paymentStatus(payment.getPaymentStatus())
-                .tokenSnap(payment.getTokenSnap())
-                .redirectUrl(payment.getRedirectUrl())
-                .build();
     }
 }

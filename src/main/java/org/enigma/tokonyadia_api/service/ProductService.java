@@ -17,9 +17,15 @@ public interface ProductService {
 
     ProductResponse getById(String id);
 
-    ProductResponse update(String id, UpdateProductRequest product);
+    ProductResponse update(String id, List<MultipartFile> files, UpdateProductRequest product);
 
-    void delete(String id);
+    void update(Product product);
+
+    void deleteById(String id);
+
+    ProductResponse updateImage(MultipartFile file, String productId);
+
+    void deleteImage(String imageId);
 
     Page<ProductResponse> getAll(SearchWithMinMaxRequest request);
 }

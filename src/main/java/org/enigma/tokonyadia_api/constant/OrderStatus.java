@@ -10,16 +10,8 @@ public enum OrderStatus {
     PENDING("Pending"),
     CONFIRMED("Confirmed"),
     PROCESSING("Processing"),
-    COMPLETED("Completed");
+    COMPLETED("Completed"),
+    FAILED("Failed");
 
     private final String description;
-
-    public static OrderStatus findByDesc(String desc) {
-        for (OrderStatus value : values()) {
-            if (value.getDescription().equalsIgnoreCase(desc)) {
-                return value;
-            }
-        }
-        return null;
-    }
 }

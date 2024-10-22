@@ -12,6 +12,8 @@ public interface ProductImageService {
 
     List<ProductImage> createBulk(List<MultipartFile> multipartFiles, Product product);
 
+    ProductImage update(String productId, MultipartFile multipartFile);
+
     void deleteById(String id);
 
     FileDownloadResponse downloadImage(String id);

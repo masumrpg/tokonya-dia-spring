@@ -13,4 +13,5 @@ public class ShipmentResponse {
     private String deliveryDate;
     private String deliveryFrom;
     private String deliveryTo;
+    private AuditInfoResponse auditInfo;
 }

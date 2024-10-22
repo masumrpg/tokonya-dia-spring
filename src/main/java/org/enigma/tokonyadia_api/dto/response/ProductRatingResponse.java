@@ -13,4 +13,5 @@ public class ProductRatingResponse {
     private String personId;
     private Double rating;
     private String review;
+    // TODO add auditInfo
 }

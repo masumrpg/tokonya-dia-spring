@@ -1,5 +1,6 @@
 package org.enigma.tokonyadia_api.util;
 
+import org.enigma.tokonyadia_api.audit.Auditable;
 import org.enigma.tokonyadia_api.dto.response.*;
 import org.enigma.tokonyadia_api.entity.*;
 
@@ -11,6 +12,7 @@ import java.util.Optional;
 public class MapperUtil {
     public static PersonResponse toPersonResponse(Person person) {
         UserResponse userResponse = toUserResponse(person.getUserAccount());
+        AuditInfoResponse auditInfoResponse = auditInfoResponse(person);
         return PersonResponse.builder()
                 .id(person.getId())
                 .name(person.getName())
@@ -19,10 +21,12 @@ public class MapperUtil {
                 .phoneNumber(person.getPhoneNumber())
                 .email(person.getEmail())
                 .userAccountId(userResponse.getId())
+                .auditInfo(auditInfoResponse)
                 .build();
     }
 
     public static ProductResponse toProductResponse(Product product) {
+        AuditInfoResponse auditInfoResponse = auditInfoResponse(product);
         return ProductResponse.builder()
                 .id(product.getId())
                 .name(product.getName())
@@ -32,10 +36,12 @@ public class MapperUtil {
                 .stock(product.getStock())
                 .storeId(product.getStore().getId())
                 .images(product.getProductImages() != null ? product.getProductImages().stream().map(MapperUtil::toProductImageResponse).toList() : new ArrayList<>())
+                .auditInfo(auditInfoResponse)
                 .build();
     }
 
     public static StoreResponse toStoreResponse(Store store) {
+        AuditInfoResponse auditInfoResponse = auditInfoResponse(store);
         return StoreResponse.builder()
                 .id(store.getId())
                 .name(store.getName())
@@ -43,6 +49,7 @@ public class MapperUtil {
                 .siup(store.getSiup())
                 .address(store.getAddress())
                 .phoneNumber(store.getPhoneNumber())
+                .auditInfo(auditInfoResponse)
                 .build();
     }
 
@@ -62,6 +69,8 @@ public class MapperUtil {
                 .orElse(Collections.emptyList())
                 .stream().toList();
 
+        AuditInfoResponse auditInfoResponse = auditInfoResponse(order);
+
         return OrderResponse.builder()
                 .orderId(order.getId())
                 .personId(order.getPerson().getId())
@@ -70,6 +79,7 @@ public class MapperUtil {
                 .orderDate(order.getOrderDate().toString())
                 .orderStatus(String.valueOf(order.getOrderStatus()))
                 .orderDetails(MapperUtil.toOrderListByStoreResponse(orderDetails))
+                .auditInfo(auditInfoResponse)
                 .build();
     }
 
@@ -103,28 +113,34 @@ public class MapperUtil {
     }
 
     public static UserResponse toUserResponse(UserAccount userAccount) {
+        AuditInfoResponse auditInfoResponse = auditInfoResponse(userAccount);
         return UserResponse.builder()
                 .id(userAccount.getId())
                 .username(userAccount.getUsername())
                 .role(userAccount.getRole().getDescription())
+                .auditInfo(auditInfoResponse)
                 .build();
     }
 
     public static ProductCategoryResponse toProductCategoryResponse(ProductCategory productCategory) {
+        AuditInfoResponse auditInfoResponse = auditInfoResponse(productCategory);
         return ProductCategoryResponse.builder()
                 .id(productCategory.getId())
                 .name(productCategory.getName())
                 .description(productCategory.getDescription())
+                .auditInfo(auditInfoResponse)
                 .build();
     }
 
     public static ShipmentResponse toShipmentResponse(Shipment shipment) {
+        AuditInfoResponse auditInfoResponse = auditInfoResponse(shipment);
         return ShipmentResponse.builder()
                 .shipmentId(shipment.getId())
                 .orderDetailId(shipment.getOrderDetail().getId())
                 .deliveryDate(shipment.getDeliveryDate().toString())
                 .deliveryFrom(shipment.getDeliveryFrom())
                 .deliveryTo(shipment.getDeliveryTo())
+                .auditInfo(auditInfoResponse)
                 .build();
     }
 
@@ -148,6 +164,7 @@ public class MapperUtil {
     public static InvoiceResponse toInvoiceResponse(Invoice invoice) {
         List<InvoiceItemResponse> invoiceItemResponseList = invoice.getInvoiceItems()
                 .stream().map(MapperUtil::toInvoiceItemResponse).toList();
+        AuditInfoResponse auditInfoResponse = auditInfoResponse(invoice);
         return InvoiceResponse.builder()
                 .id(invoice.getId())
                 .orderId(invoice.getOrder().getId())
@@ -156,6 +173,7 @@ public class MapperUtil {
                 .totalAmount(invoice.getTotalAmount())
                 .shopName(invoice.getShopName())
                 .items(invoiceItemResponseList)
+                .auditInfo(auditInfoResponse)
                 .build();
     }
 
@@ -166,6 +184,27 @@ public class MapperUtil {
                 .quantity(invoiceItem.getQuantity())
                 .price(invoiceItem.getProductPrice())
                 .totalPrice(invoiceItem.getTotalPrice())
+                .build();
+    }
+
+    public static PaymentResponse toPaymentResponse(Payment payment) {
+        AuditInfoResponse auditInfoResponse = auditInfoResponse(payment);
+        return PaymentResponse.builder()
+                .orderId(payment.getOrder().getId())
+                .amount(payment.getAmount())
+                .paymentStatus(payment.getPaymentStatus())
+                .tokenSnap(payment.getTokenSnap())
+                .redirectUrl(payment.getRedirectUrl())
+                .auditInfo(auditInfoResponse)
+                .build();
+    }
+
+    private static <T extends Auditable<String>> AuditInfoResponse auditInfoResponse(T auditInfo) {
+        return AuditInfoResponse.builder()
+                .createdBy(auditInfo.getCreatedBy())
+                .createdDate(auditInfo.getCreatedDate().toString())
+                .updatedBy(auditInfo.getUpdatedBy())
+                .updatedDate(auditInfo.getUpdatedDate().toString())
                 .build();
     }
 }

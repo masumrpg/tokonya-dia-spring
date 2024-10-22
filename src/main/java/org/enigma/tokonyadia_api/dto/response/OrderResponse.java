@@ -18,4 +18,5 @@ public class OrderResponse {
     private String orderDate;
     private String orderStatus;
     private List<OrderByStoreResponse> orderDetails;
+    private AuditInfoResponse auditInfo;
 }

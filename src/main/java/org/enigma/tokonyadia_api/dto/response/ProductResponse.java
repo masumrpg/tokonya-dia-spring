@@ -18,4 +18,5 @@ public class ProductResponse {
     private Integer stock;
     private String storeId;
     private List<FileResponse> images;
+    private AuditInfoResponse auditInfo;
 }

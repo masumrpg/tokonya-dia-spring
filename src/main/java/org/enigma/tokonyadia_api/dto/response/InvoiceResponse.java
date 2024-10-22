@@ -23,4 +23,6 @@ public class InvoiceResponse {
     private String shopName;
 
     private List<InvoiceItemResponse> items;
+
+    private AuditInfoResponse auditInfo;
 }

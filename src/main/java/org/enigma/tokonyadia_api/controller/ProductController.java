@@ -2,6 +2,8 @@ package org.enigma.tokonyadia_api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -34,8 +36,10 @@ public class ProductController {
     @Operation(summary = "Create Product", description = "Create a new product with optional images")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> createProduct(
-            @RequestParam(name = "images", required = false) List<MultipartFile> multipartFiles,
-            @RequestPart(name = "menu") String product
+//            @RequestParam(name = "images", required = false) List<MultipartFile> multipartFiles,
+//            @RequestPart(name = "menu") String product,
+            @Parameter(content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE)) @RequestPart(name = "images", required = false) List<MultipartFile> multipartFiles,
+            @RequestPart(name = "product") String product
     ) {
         try {
             ProductRequest productRequest = objectMapper.readValue(product, ProductRequest.class);
@@ -53,17 +57,27 @@ public class ProductController {
         return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_GET_PRODUCT, productResponse);
     }
 
+    // TODO @Preauthorize
     @Operation(summary = "Update Product", description = "Update an existing product by its ID")
     @PutMapping("/{productId}")
-    public ResponseEntity<?> updateProduct(@PathVariable String productId, @RequestBody UpdateProductRequest product) {
-        ProductResponse productResponse = productServiceImpl.update(productId, product);
-        return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_UPDATE_PRODUCT, productResponse);
+    public ResponseEntity<?> updateProduct(
+            @PathVariable String productId,
+            @Parameter(content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE)) @RequestPart(name = "images", required = false) List<MultipartFile> files,
+            @RequestPart(name = "product") String product
+    ) {
+        try {
+            UpdateProductRequest updateProductRequest = objectMapper.readValue(product, UpdateProductRequest.class);
+            ProductResponse productResponse = productServiceImpl.update(productId, files, updateProductRequest);
+            return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_UPDATE_PRODUCT, productResponse);
+        } catch (Exception e) {
+            return ResponseUtil.buildCommonResponse(HttpStatus.BAD_REQUEST, e.getMessage(), null);
+        }
     }
 
     @Operation(summary = "Delete Product", description = "Delete a product by its ID")
     @DeleteMapping("/{productId}")
     public ResponseEntity<?> deleteProduct(@PathVariable String productId) {
-        productServiceImpl.delete(productId);
+        productServiceImpl.deleteById(productId);
         return ResponseUtil.buildCommonResponse(HttpStatus.OK, Constant.SUCCESS_DELETE_PRODUCT, null);
     }
 

@@ -178,14 +178,28 @@ public class OrderServiceImpl implements OrderService {
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
-        order.getOrderDetails().forEach(orderDetail -> uniqueStores.forEach(store -> {
-            Shipment newShipment = Shipment.builder()
-                    .deliveryFrom(store.getAddress())
-                    .deliveryTo(person.getAddress())
-                    .orderDetail(orderDetail)
-                    .build();
-            orderDetail.setShipment(newShipment);
-        }));
+        order.getOrderDetails().forEach(orderDetail -> {
+            Product product = orderDetail.getProduct();
+            int orderQuantity = orderDetail.getQuantity();
+            int availableStock = product.getStock();
+
+            if (orderQuantity > availableStock) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Insufficient stock for product: " + product.getName());
+            }
+
+            product.setStock(availableStock - orderQuantity);
+            productService.update(product);
+
+            uniqueStores.forEach(store -> {
+                Shipment newShipment = Shipment.builder()
+                        .deliveryFrom(store.getAddress())
+                        .deliveryTo(person.getAddress())
+                        .orderDetail(orderDetail)
+                        .build();
+                orderDetail.setShipment(newShipment);
+            });
+        });
+
 
         order.setOrderStatus(OrderStatus.PENDING);
         Order updatedOrder = orderRepository.saveAndFlush(order);
@@ -202,7 +216,14 @@ public class OrderServiceImpl implements OrderService {
         }
 
         order.getOrderDetails().forEach(orderDetail -> {
-            log.error(orderDetail.getShipment().getId());
+            Product product = orderDetail.getProduct();
+            int orderQuantity = orderDetail.getQuantity();
+
+            // Restore the product stock
+            product.setStock(product.getStock() + orderQuantity);
+            productService.update(product);
+
+            // Restore shipment
             if (orderDetail.getShipment().getId() != null) {
                 orderDetail.setShipment(null);
             }

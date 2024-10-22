@@ -15,4 +15,5 @@ public class StoreResponse {
     private String siup;
     private String phoneNumber;
     private String address;
+    private AuditInfoResponse auditInfo;
 }

@@ -5,10 +5,7 @@ import org.enigma.tokonyadia_api.dto.request.ProductRequest;
 import org.enigma.tokonyadia_api.dto.request.SearchWithMinMaxRequest;
 import org.enigma.tokonyadia_api.dto.request.UpdateProductRequest;
 import org.enigma.tokonyadia_api.dto.response.ProductResponse;
-import org.enigma.tokonyadia_api.entity.Product;
-import org.enigma.tokonyadia_api.entity.ProductCategory;
-import org.enigma.tokonyadia_api.entity.ProductImage;
-import org.enigma.tokonyadia_api.entity.Store;
+import org.enigma.tokonyadia_api.entity.*;
 import org.enigma.tokonyadia_api.repository.ProductRepository;
 import org.enigma.tokonyadia_api.service.ProductCategoryService;
 import org.enigma.tokonyadia_api.service.ProductImageService;
@@ -78,9 +75,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public ProductResponse update(String id, UpdateProductRequest request) {
+    public ProductResponse update(String id, List<MultipartFile> files, UpdateProductRequest request) {
         validationUtil.validate(request);
-        Store store = storeService.getOne(request.getStoreId());
         ProductCategory productCategory = productCategoryService.getOne(request.getCategoryId());
 
         Product existingProduct = getOne(id);
@@ -89,15 +85,49 @@ public class ProductServiceImpl implements ProductService {
         existingProduct.setDescription(request.getDescription());
         existingProduct.setPrice(request.getPrice());
         existingProduct.setStock(request.getStock());
-        existingProduct.setStore(store);
+
+        if (files != null && !files.isEmpty()) {
+            List<ProductImage> productImages = productImageService.createBulk(files, existingProduct);
+            if (existingProduct.getProductImages() != null) {
+                existingProduct.getProductImages().addAll(productImages);
+            } else {
+                existingProduct.setProductImages(productImages);
+            }
+        }
+
         return toProductResponse(existingProduct);
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void delete(String id) {
-        productRepository.delete(getOne(id));
+    public void update(Product product) {
+        productRepository.save(product);
     }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void deleteById(String id) {
+        Product product = getOne(id);
+        if (product.getProductImages() != null && !product.getProductImages().isEmpty()) {
+            product.getProductImages().stream().map(File::getId)
+                    .forEach(productImageService::deleteById);
+        }
+        productRepository.delete(product);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public ProductResponse updateImage(MultipartFile file, String productId) {
+        ProductImage productImage = productImageService.update(productId, file);
+        return MapperUtil.toProductResponse(productImage.getProduct());
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void deleteImage(String imageId) {
+        productImageService.deleteById(imageId);
+    }
+
 
     @Transactional(readOnly = true)
     @Override

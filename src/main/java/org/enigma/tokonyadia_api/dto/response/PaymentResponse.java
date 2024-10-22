@@ -14,4 +14,5 @@ public class PaymentResponse {
     private PaymentStatus paymentStatus;
     private String tokenSnap;
     private String redirectUrl;
+    private AuditInfoResponse auditInfo;
 }
