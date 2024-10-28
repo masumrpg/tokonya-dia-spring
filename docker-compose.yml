@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  # Service untuk Spring Boot aplikasi
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      SERVER_PORT: 8888
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: tokonyadia
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      JWT_SECRET: secret
+      JWT_EXPIRATION_IN_MINUTES: 60
+      JWT_ISSUER: Tokonya Dia API
+      REFRESH_TOKEN_EXPIRATION_IN_HOUR: 24
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ""
+      USERNAME_ADMIN: admin
+      PASSWORD_ADMIN: Adminpassword123@
+      MENU_IMAGE_PATH: /app/images
+      MIDTRANS_APP_URL: https://app.sandbox.midtrans.com
+      MIDTRANS_API_URL: https://api.sandbox.midtrans.com
+      MIDTRANS_SERVER_KEY: SB-Mid-server-Fufrjmw8dPA5vow16qEshkvi
+    ports:
+      - "8888:8888"
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - ./images:/app/images
+
+  # Service untuk PostgreSQL
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: tokonyadia
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  # Service untuk Redis
+  redis:
+    image: redis:alpine
+    environment:
+      REDIS_PASSWORD: ""
+    ports:
+      - "6379:6379"
+    command: [ "redis-server", "--requirepass", "" ]
+
+volumes:
+  pgdata:
