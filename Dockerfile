@@ -5,7 +5,7 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # Salin JAR file aplikasi ke dalam container
-COPY target/tokonyadia.jar /app/tokonyadia.jar
+COPY target/tokonyadia-api-0.0.1-SNAPSHOT.jar /app/tokonyadia.jar
 
 # Tentukan perintah untuk menjalankan aplikasi
 ENTRYPOINT ["java", "-jar", "/app/tokonyadia.jar"]
