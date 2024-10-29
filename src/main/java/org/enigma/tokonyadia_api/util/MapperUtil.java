@@ -21,6 +21,7 @@ public class MapperUtil {
                 .phoneNumber(person.getPhoneNumber())
                 .email(person.getEmail())
                 .userAccountId(userResponse.getId())
+                .role(userResponse.getRole())
                 .auditInfo(auditInfoResponse)
                 .build();
     }

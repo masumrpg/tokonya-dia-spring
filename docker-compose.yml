@@ -19,7 +19,7 @@ services:
       REFRESH_TOKEN_EXPIRATION_IN_HOUR: 24
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      REDIS_PASSWORD: ""
+      REDIS_PASSWORD: "Muhammadmazum1"
       USERNAME_ADMIN: admin
       PASSWORD_ADMIN: Adminpassword123@
       MENU_IMAGE_PATH: /app/images
@@ -27,7 +27,7 @@ services:
       MIDTRANS_API_URL: https://api.sandbox.midtrans.com
       MIDTRANS_SERVER_KEY: SB-Mid-server-Fufrjmw8dPA5vow16qEshkvi
     ports:
-      - "8888:8888"
+      - "80:8888"
     depends_on:
       - db
       - redis
@@ -53,7 +53,7 @@ services:
       REDIS_PASSWORD: ""
     ports:
       - "6379:6379"
-    command: [ "redis-server", "--requirepass", "" ]
+    command: [ "redis-server", "--requirepass", "Muhammadmazum1" ]
 
 volumes:
   pgdata:

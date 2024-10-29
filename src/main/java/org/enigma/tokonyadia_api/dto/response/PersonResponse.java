@@ -15,5 +15,6 @@ public class PersonResponse {
     private String phoneNumber;
     private String address;
     private String userAccountId;
+    private String role;
     private AuditInfoResponse auditInfo;
 }
