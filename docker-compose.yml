@@ -3,6 +3,7 @@
 services:
   # Service untuk Spring Boot aplikasi
   app:
+    container_name: app-container
     build:
       context: .
       dockerfile: Dockerfile
@@ -36,6 +37,7 @@ services:
 
   # Service untuk PostgreSQL
   db:
+    container_name: db-container
     image: postgres:15
     environment:
       POSTGRES_DB: tokonyadia
@@ -48,6 +50,7 @@ services:
 
   # Service untuk Redis
   redis:
+    container_name: redis-container
     image: redis:alpine
     environment:
       REDIS_PASSWORD: ""
