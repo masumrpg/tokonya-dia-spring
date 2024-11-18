@@ -1,7 +1,7 @@
-#version: '3.8'
+version: '3.8'
 
 services:
-  # Service untuk Spring Boot aplikasi
+  # Spring Boot App
   app:
     container_name: app-container
     build:
@@ -20,7 +20,7 @@ services:
       REFRESH_TOKEN_EXPIRATION_IN_HOUR: 24
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      REDIS_PASSWORD: "Muhammadmazum1"
+      REDIS_PASSWORD: "Redispassword"
       USERNAME_ADMIN: admin
       PASSWORD_ADMIN: Adminpassword123@
       MENU_IMAGE_PATH: /app/images
@@ -34,8 +34,9 @@ services:
       - redis
     volumes:
       - ./images:/app/images
+    restart: always # Tambahkan restart policy untuk memastikan aplikasi otomatis restart jika gagal
 
-  # Service untuk PostgreSQL
+  # PostgreSQL
   db:
     container_name: db-container
     image: postgres:15
@@ -47,8 +48,14 @@ services:
       - pgdata:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    healthcheck: # Health check
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always # restart policy
 
-  # Service untuk Redis
+  # Redis
   redis:
     container_name: redis-container
     image: redis:alpine
@@ -56,7 +63,8 @@ services:
       REDIS_PASSWORD: ""
     ports:
       - "6379:6379"
-    command: [ "redis-server", "--requirepass", "Muhammadmazum1" ]
+    command: [ "redis-server", "--requirepass", "Redispassword" ]
+    restart: always # restart policy
 
 volumes:
   pgdata:
