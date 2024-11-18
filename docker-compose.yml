@@ -29,6 +29,7 @@ services:
       MIDTRANS_SERVER_KEY: SB-Mid-server-Fufrjmw8dPA5vow16qEshkvi
     ports:
       - "80:80"
+      - "443:443"
     depends_on:
       - db
       - redis
