@@ -60,7 +60,7 @@ services:
     container_name: redis-container
     image: redis:alpine
     environment:
-      REDIS_PASSWORD: ""
+      REDIS_PASSWORD: "Redispassword"
     ports:
       - "6379:6379"
     command: [ "redis-server", "--requirepass", "Redispassword" ]
