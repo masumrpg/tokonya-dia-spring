@@ -28,7 +28,7 @@ services:
       MIDTRANS_API_URL: https://api.sandbox.midtrans.com
       MIDTRANS_SERVER_KEY: SB-Mid-server-Fufrjmw8dPA5vow16qEshkvi
     ports:
-      - "8080:8888"
+      - "80:8888"
     depends_on:
       - db
       - redis
