@@ -66,29 +66,5 @@ services:
     command: [ "redis-server", "--requirepass", "Redispassword" ]
     restart: always # restart policy
 
-  # Prometheus
-  prometheus:
-    container_name: prometheus-container
-    image: prom/prometheus:latest
-    volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-    ports:
-      - "9090:9090"
-    restart: always # restart policy
-
-  # Grafana
-  grafana:
-    container_name: grafana-container
-    image: grafana/grafana:latest
-    environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
-    ports:
-      - "3000:3000"
-    restart: always # restart policy
-    volumes:
-      - grafana-data:/var/lib/grafana
-
 volumes:
   pgdata:
-  grafana-data:
