@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-  # Spring Boot App
   app:
     container_name: app-container
     build:
@@ -11,60 +10,100 @@ services:
       SERVER_PORT: 8080
       DB_HOST: db
       DB_PORT: 5432
-      DB_NAME: tokonyadia
-      DB_USERNAME: postgres
-      DB_PASSWORD: postgres
-      JWT_SECRET: secret
+      DB_NAME: ${DB_NAME}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRATION_IN_MINUTES: 60
       JWT_ISSUER: Tokonya Dia API
       REFRESH_TOKEN_EXPIRATION_IN_HOUR: 24
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      REDIS_PASSWORD: "Redispassword"
-      USERNAME_ADMIN: admin
-      PASSWORD_ADMIN: Adminpassword123@
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      USERNAME_ADMIN: ${ADMIN_USERNAME}
+      PASSWORD_ADMIN: ${ADMIN_PASSWORD}
       MENU_IMAGE_PATH: /app/images
-      MIDTRANS_APP_URL: https://app.sandbox.midtrans.com
-      MIDTRANS_API_URL: https://api.sandbox.midtrans.com
-      MIDTRANS_SERVER_KEY: SB-Mid-server-Fufrjmw8dPA5vow16qEshkvi
+      MIDTRANS_APP_URL: ${MIDTRANS_APP_URL}
+      MIDTRANS_API_URL: ${MIDTRANS_API_URL}
+      MIDTRANS_SERVER_KEY: ${MIDTRANS_SERVER_KEY}
     ports:
       - "8080:8080"
     depends_on:
       - db
       - redis
     volumes:
-      - ./images:/app/images
-    restart: always # restart policy
+      - ./images:/app/images:ro
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - frontend-network
+      - backend-network
+    restart: unless-stopped
 
-  # PostgreSQL
   db:
     container_name: db-container
-    image: postgres:15
+    image: postgres:15-alpine
     environment:
-      POSTGRES_DB: tokonyadia
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - pgdata:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-    healthcheck: # Health check
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+    healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 10s
       timeout: 5s
       retries: 5
-    restart: always # restart policy
+    networks:
+      - backend-network
+    restart: unless-stopped
 
-  # Redis
   redis:
     container_name: redis-container
-    image: redis:alpine
+    image: redis:7-alpine
     environment:
-      REDIS_PASSWORD: "Redispassword"
-    ports:
-      - "6379:6379"
-    command: [ "redis-server", "--requirepass", "Redispassword" ]
-    restart: always # restart policy
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    command: [ "redis-server", "--requirepass", "${REDIS_PASSWORD}" ]
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 500M
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - backend-network
+    restart: unless-stopped
+
+networks:
+  frontend-network:
+    driver: bridge
+  backend-network:
+    driver: bridge
+    internal: true
 
 volumes:
   pgdata:
+    driver: local
