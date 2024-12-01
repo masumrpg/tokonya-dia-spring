@@ -32,7 +32,7 @@ services:
       - db
       - redis
     volumes:
-      - ./images:/app/images:ro
+      - ./images:/app/images
     security_opt:
       - no-new-privileges:true
     deploy:
