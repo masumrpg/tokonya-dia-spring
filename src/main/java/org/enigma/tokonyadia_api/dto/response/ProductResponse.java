@@ -16,7 +16,7 @@ public class ProductResponse {
     private String description;
     private Long price;
     private Integer stock;
-    private String storeId;
+    private String store;
     private List<FileResponse> images;
     private AuditInfoResponse auditInfo;
 }

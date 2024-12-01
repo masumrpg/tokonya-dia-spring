@@ -35,7 +35,7 @@ public class MapperUtil {
                 .description(product.getDescription())
                 .price(product.getPrice())
                 .stock(product.getStock())
-                .storeId(product.getStore().getId())
+                .store(product.getStore().getName())
                 .images(product.getProductImages() != null ? product.getProductImages().stream().map(MapperUtil::toProductImageResponse).toList() : new ArrayList<>())
                 .auditInfo(auditInfoResponse)
                 .build();
