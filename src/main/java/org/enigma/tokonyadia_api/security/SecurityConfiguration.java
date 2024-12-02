@@ -43,6 +43,7 @@ public class SecurityConfiguration {
                                 .requestMatchers(HttpMethod.GET, "/api/images/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/actuator/prometheus").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/metrics").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
