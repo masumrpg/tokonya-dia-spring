@@ -21,7 +21,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(path = Constant.PRODUCT_CATEGORY_API)
+@RequestMapping(path = Constant.CATEGORY_API)
 @RequiredArgsConstructor
 @SecurityRequirement(name = "Bearer Authentication")
 @Tag(name = "Product Category", description = "APIs for managing product categories")

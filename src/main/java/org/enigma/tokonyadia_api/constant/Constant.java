@@ -27,7 +27,7 @@ public class Constant {
     public static final String PRODUCT_API = "/api/products";
     public static final String STORE_API = "/api/stores";
     public static final String ORDER_API = "/api/orders";
-    public static final String PRODUCT_CATEGORY_API = "/api/products/categories";
+    public static final String CATEGORY_API = "/api/categories";
     public static final String PRODUCT_RATING_API = "/api/products/ratings";
     public static final String PAYMENT_API = "/api/payments";
     public static final String INVOICE_API = "/api/invoices";
